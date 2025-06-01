@@ -1,0 +1,297 @@
+typedef struct {
+    local float flt = ReadFloat();
+    uint value;
+} UndeterminedFieldType <read=ReadUndeterminedFT, optimize=false>;
+
+typedef struct {
+	uint parameterNameHash;
+	float constantValue; // if parameterType == 1 => can be float (example: 3.14 in efd_capcom_insect_moth00_0000.efx.2818689)
+	uint parameterType; // 0 = local/efx parameter, 1 = constant (float?), 2 = external parameter?
+} EFXExpressionParameterName <read=FindExpressionParamName_ExpressionArgStruct>;
+
+string ReadUndeterminedFT(UndeterminedFieldType &ft) {
+    if (ft.value == 0) {
+        return "0";
+    }
+    if (ft.value > -1000 && ft.value < 1000) {
+        return Str("INT: %d", ft.value);
+    }
+    if (ft.flt > -1000.0&& ft.value < -0.0001 || ft.flt > 0.0001 && ft.flt < 1000.0) {
+        return Str("FLT: %f", ft.flt);
+    }
+
+    return Str("INT: %d   FLT: %f", ft.value, ft.flt);
+}
+
+typedef struct {
+    ubyte b1, b2, b3, b4;
+} ByteSet <read=Str("%d %d %d %d", b1, b2, b3, b4)>;
+
+typedef struct
+{
+	float frameTime;
+	FrameInterpolationType type;
+    if (IsIntegerClip(this)) {
+        uint value;
+    } else {
+        float value;
+    }
+} TClipFrameType <read=ReadClipFrameType>;
+
+typedef struct EFXExpressionParameter
+{
+	uint expressionParameterNameUTF16Hash;
+	uint expressionParameterNameUTF8Hash;
+	EfxExpressionParameterType type;
+	float value1;
+	float value2;
+	float value3;
+};
+
+typedef struct EFXFieldParameterValue
+{
+	uint unkn0;
+	uint fieldParameterNameHash;
+	uint unkn2;
+	uint type;
+	uint unkn4;
+	int value_ukn1;
+};
+
+typedef struct EFXExpressionDataFloat
+{
+	float value;
+};
+
+typedef struct EFXExpressionDataBinaryOperator
+{
+	uint binary;
+};
+
+typedef struct EFXExpressionDataUnaryOperator
+{
+	uint zero;
+};
+
+typedef struct EFXExpressionDataFunction
+{
+	uint func;
+};
+
+typedef struct EFXExpressionDataTypeParameterHash_t
+{
+	uint parameterHash;
+} EFXExpressionDataParameterHash <read=FindExpressionParamName_DataTypeParameterHash>;
+
+typedef struct
+{
+	uint type;
+	if (type == 0) {
+		EFXExpressionDataFloat data;
+	} else if (type == 1) {
+		EFXExpressionDataBinaryOperator data;
+	} else if (type == 2) {
+		EFXExpressionDataUnaryOperator data;
+	} else if (type == 3) {
+		EFXExpressionDataFunction data;
+	} else if (type == 4) {
+		EFXExpressionDataParameterHash data;
+	} else {
+		Warning("Unhandled case, template stopping");
+		Exit(1);
+	}
+} EFXExpressionData <read=EFXExpressionDataName>;
+
+typedef struct
+{
+	int parameterCount;
+	int componentsCount;
+    if (Version >= EfxVersion_DD2) {
+        int struct3count;
+    }
+	if (parameterCount > 0) EFXExpressionParameterName parameters[parameterCount] <optimize=false>;
+	if (componentsCount > 0) EFXExpressionData components[componentsCount] <optimize=false>;
+} EFXExpressionObject <read=ReadExpression>;
+
+typedef struct(int bitCount)
+{
+    local int maxCount = bitCount;
+    local int i = 0;
+    local int setCount = 0;
+    for (i = 0; i < (bitCount + 31) >> 5; i++) {
+        uint bits<format=binary>;
+    }
+    for (i = 0; i < bitCount; i++) {
+        if (bits[i >> 5] & (1 << (i - 32 * (i >> 5)))) {
+            setCount++;
+        }
+    }
+} BitSet <read=Str("(%d of up to %d bits)", setCount, maxCount)>;
+
+typedef struct
+{
+	uint unkn1;
+	uint unkn2;
+	uint mdfPropertyHash;
+	uint propertyComponentIndex;
+    if (Version >= EfxVersion_RE4) {
+	    uint unkn5;
+    }
+	EFXExpressionObject expression;
+} EFXMaterialExpression <read=ReadExpression(expression)>;
+
+typedef struct
+{
+    uint solverSize;
+    local long start = FTell();
+    local long end = FTell() + solverSize;
+    while (FTell() < end) {
+        EFXExpressionObject expression;
+    }
+} EFXExpressionList<read=ReadEFXExpressionList>;
+
+typedef struct EFXExpressionListBase
+{
+	uint solverSize;
+};
+
+typedef struct EFXMaterialExpressionList
+{
+	uint solverSize;
+	int indexCount;
+
+    local long start = FTell();
+    local long end = FTell() + solverSize;
+    while (FTell() < end) {
+        EFXMaterialExpression expression;
+    }
+	if (indexCount > 0) uint data2[indexCount] <optimize=false>;
+};
+
+
+
+wstring FindExpressionParamName(EFXR &efxr, uint hash) {
+    local int i = 0;
+
+    for (i = 0; i < efxr.header.expressionParameterCount; i++) {
+        if (hash_ascii(efxr.strings.expression_parameter_name[i].str) == hash) {
+            return efxr.strings.expression_parameter_name[i].str;
+        }
+    }
+
+    if (exists(parentof(efxr).embedded_efxr)) {
+        return FindExpressionParamName(main_efxr, hash);
+    }
+
+    switch (hash) {
+        case 4068760923: return "<PI>";
+        case 2715150528: return "<speed>";
+        case 4102950055: return "<Speed>";
+        case 3351123696: return "<scale>";
+        case 2589222962: return "<TIMER>";
+        case 124194757: return "<alpha>";
+        case 1124845316: return "<Color>";
+        case 2521345197: return "<color>";
+        case 1703575233: return "<pitch>";
+        case 3888230594: return "<yaw>";
+        case 2703807999: return "<roll>";
+        case 1484922460: return "<ColorRange>";
+        case 3710676630: return "<Piece_Color>";
+        case 3720841511: return "<int_num>";
+        case 480772615: return "<Wide>";
+        case 1042548107: return "<LightShadowRatio>";
+        case 4001584140: return "<BackFaceLightRatio>";
+        case 4053326860: return "<SpawnNum>";
+    }
+
+    return Str("[extern %u]", hash);
+}
+
+wstring EFXExpressionDataName(EFXExpressionData &data) {
+    if (data.type == 4) {
+        return FindExpressionParamName_DataTypeParameterHash(data.data);
+    }
+    if (data.type == 0) {
+        return Str("%f", data.data.value);
+    }
+    if (data.type == 1) {
+        switch (data.data.binary) {
+            case 0: return "Max";
+            case 1: return "+";
+            case 2: return "-";
+            case 3: return "*";
+            case 4: return "/";
+            case 5: return "Min";
+            default: return "???";
+        }
+    }
+    if (data.type == 2) {
+        return "negative";
+    }
+    if (data.type == 3) {
+        switch (data.data.func) {
+            case 15: return "Lerp";
+            case 16: return "InvLerp";
+            case 17: return "Clamp";
+            default: return Str("Unary%u", data.data.func);
+        }
+    }
+
+    return "???";
+}
+
+wstring FindExpressionParamName_ExpressionArgStruct(EFXExpressionParameterName &param) {
+    if (exists( parentof(parentof(parentof(parentof(parentof(parentof(param)))))).strings )) {
+        return FindExpressionParamName(parentof(parentof(parentof(parentof(parentof(parentof(param)))))), param.parameterNameHash);
+    } else if (exists( parentof(parentof(parentof(parentof(parentof(parentof(parentof(param))))))).strings )) {
+        return FindExpressionParamName(parentof(parentof(parentof(parentof(parentof(parentof(parentof(param))))))), param.parameterNameHash);
+    }
+    return Str("Unknown %u", param.parameterNameHash);
+}
+wstring FindExpressionParamName_DataTypeParameterHash(EFXExpressionDataParameterHash &param) {
+    if (exists( parentof(parentof(parentof(parentof(parentof(parentof(parentof(param))))))).strings )) {
+        return FindExpressionParamName(parentof(parentof(parentof(parentof(parentof(parentof(parentof(param))))))), param.parameterHash);
+    } else if (exists( parentof(parentof(parentof(parentof(parentof(parentof(parentof(parentof(param)))))))).strings )) {
+        return FindExpressionParamName(parentof(parentof(parentof(parentof(parentof(parentof(parentof(parentof(param)))))))), param.parameterHash);
+    }
+    return "---";
+}
+
+// useful expression args samples:
+// RE2 efd_capcom_insect_moth00_0000.efx.2818689
+// dmc5 efd_03_fly_000_00.efx.1769672
+// re7 vfx_efd_capcom_break_00_001_0000.efx.1179750
+// re7 vfx_efd_capcom_creature_01_000_0000.efx.1179750
+// re7 vfx_efd_bh7_em5510_0005.efx.2818689    (MASSIVE 41 component expression)
+
+wstring ReadExpression(EFXExpressionObject &expression) {
+    if (expression.componentsCount == 0) return "/";
+    local int i = 0;
+    local wstring outstr = "";
+    for (i = 0; i < expression.componentsCount; i++) {
+        outstr += EFXExpressionDataName(expression.components[i]) + " ";
+    }
+    return outstr;
+}
+wstring ReadEFXExpressionList(EFXExpressionList &wrapper) {
+    if (wrapper.solverSize == 0) return "empty";
+    local int i = 0;
+    local wstring outstr = "";
+    while (exists(wrapper.expression[i])) {
+        outstr += ReadExpression(wrapper.expression[i]) + " ; ";
+        i++;
+    }
+    return outstr;
+}
+
+uint8 IsIntegerClip(TClipFrameType &frame) {
+    return exists( parentof(parentof(frame)).colorChannelBits );
+}
+
+string ReadClipFrameType(TClipFrameType &frame) {
+    if ( IsIntegerClip(frame) ) {
+        return Str("%f: %d", frame.frameTime, frame.value);
+    } else {
+        return Str("%f: %f", frame.frameTime, frame.value);
+    }
+}

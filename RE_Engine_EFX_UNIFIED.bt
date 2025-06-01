@@ -1,0 +1,748 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File:
+//   Authors: shadowcookie
+//   Version: V1.0
+//   Purpose: RE Engine EFX
+//  Category:
+// File Mask: *.efxpreset,*.efx.*
+//  ID Bytes:
+//   History: Based on work by NSA Cloud, ZippoIG, Darkness; Structs mostly source generated from kagenocookie/RszTool
+
+
+//------------------------------------------------
+LittleEndian();
+
+#include "RE_EFX_ENUMS.bt"
+
+//EFX VERSIONS
+EfxVersion GetVersion(int fileVersion)
+{
+	if (fileVersion == 1179750) return EfxVersion_RE7;
+	if (fileVersion == 1769669) return EfxVersion_RE2;
+	if (fileVersion == 1769672) return EfxVersion_DMC5;
+	if (fileVersion == 2228526) return EfxVersion_RE3;
+	if (fileVersion == 2621987) return EfxVersion_MHRise;
+	if (fileVersion == 2621998) return EfxVersion_RE8;
+	if (fileVersion == 2818689) return EfxVersion_RERT;
+	if (fileVersion == 2818730) return EfxVersion_MHRiseSB;
+	if (fileVersion == 3474371) return EfxVersion_SF6;
+	if (fileVersion == 3539837) return EfxVersion_RE4;
+	if (fileVersion == 4064419) return EfxVersion_DD2;
+	if (fileVersion == 5571972) return EfxVersion_MHWilds;
+	return EfxVersion_Unknown;
+}
+
+local int Version = GetVersion(Atoi(SubStr(FileNameGetExtension(GetFileName()), 1)));
+
+Printf("EFX Version %i\n",Version);
+
+#include "RE_EFX_TYPES.bt"
+
+/*
+
+NOTES:
+Set the character set to UTF-8 in View > Character Set
+
+If you map any of the unknowns, submit a pull request or issue on GitHub and I'll add the changes.
+
+*/
+
+//UTILITY STRUCTS
+typedef struct
+{
+
+	ubyte red<fgcolor=0x0000FF>;
+	ubyte green<fgcolor=0x00FF00>;
+	ubyte blue<fgcolor=0xFF0000>;
+	ubyte alpha<fgcolor=0xAAAAAA>;
+
+}Color<read=ReadColor,optimize=false>;
+
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+}Vec3<read=ReadVec3>;
+
+typedef struct
+{
+	float x;
+	float y;
+}Vec2<read=Str("%f %f", x, y)>;
+
+typedef struct
+{
+	int x;
+	int y;
+	int z;
+}Int3<read=ReadInt3>;
+
+typedef struct
+{
+    int value;
+    int valueRandom;
+}Int2<read=ReadInt2>;
+typedef struct
+{
+	int s;
+	int r;
+}RangeI;
+void ReadEFXAttribute()
+{
+	local uint itemType = ReadUInt();
+	GetEFXItemStruct(GetEFXStructName(itemType));
+}
+
+
+
+
+typedef struct
+{
+	char type[4];
+	int unkn0;//constant
+	uint entryCount<bgcolor=0x22AA22>;
+	uint entryLength<bgcolor=0x22AA22>;
+	uint actionCount;
+    if (Version > EfxVersion_RE7)
+    {
+		uint fieldParameterCount;//Amount of "Field" efx attributes
+	}
+	uint expressionParameterCount<bgcolor=0x226622>;
+	uint effectGroupCount<bgcolor=0x224422>;
+	uint effectGroupLength;
+    if (Version > EfxVersion_DMC5)
+    {
+        uint boneCount<bgcolor=0x226622>;
+	    uint boneAttributeEntryCount;
+	    uint unknFlag;//Mainly used in cutscene efx, not sure of it's purpose. Example: vfx\editor\efd_evc\efd_evc1508\efd_0004_evc1508_00_0035.efx.2818730
+    }
+
+}Header<optimize = false, bgcolor=0x2f4f4f>;
+typedef struct
+{
+	string str;
+}EntryName<bgcolor=0x22AA22,optimize=false>;
+typedef struct
+{
+	string str;
+	wstring unicodeStr;
+}UnicodeEntryName<bgcolor=0x226622,optimize=false>;
+
+typedef struct
+{
+		if (header.expressionParameterCount > 0) {
+			UnicodeEntryName expression_parameter_name[header.expressionParameterCount]<read=unicodeStr>;
+		}
+		if (Version > EfxVersion_DMC5 && header.boneCount > 0)
+		UnicodeEntryName bone_name[header.boneCount]<read=unicodeStr>;
+
+		if (Version > EfxVersion_RE7 && header.actionCount > 0)
+			EntryName action_name[header.actionCount]<read=ReadStr>;
+
+		if (exists(header.fieldParameterCount) && header.fieldParameterCount > 0) {
+			if (Version > EfxVersion_RE7) {
+				EntryName field_parameter_name[header.fieldParameterCount]<read=ReadStr>;
+			} else {
+				UnicodeEntryName field_parameter_name[header.fieldParameterCount]<read=unicodeStr>;
+			}
+		}
+		if (header.entryCount > 0)
+		EntryName efx_name[header.entryCount]<read=ReadStr>;
+		if (header.effectGroupCount > 0)
+		EntryName collision_effect_name[header.effectGroupCount]<read=ReadStr>;
+		if (Version <= EfxVersion_RE7 && header.actionCount > 0)
+			EntryName action_name[header.actionCount]<read=ReadStr>;
+}EntryNames;
+typedef struct
+{
+	local int entryIndex = -999;
+    local int attributeIndex = -999;
+	short boneNameIndex;
+}boneAttributeRelation<optimize = false>;
+
+typedef struct
+{
+	local uint currentEntryIndex = parentof(this).i;
+	uint expressionParameterNameUTF16Hash;
+	uint expressionParameterNameUTF8Hash;
+	uint type;
+	if (type == 0) {
+		float value;
+		FSkip(8);
+	} else if (type == 1) {
+		Color color;
+		FSkip(8);
+	} else if (type == 3) {
+		float value1;
+		FSkip(8);
+	} else { // 2 = range
+		float value1<comment="Range Default">;
+		float value2<comment="Range Min">;
+		float value3<comment="Range Max">;
+	}
+}ExpressionParameterValue<read=ReadExpressionParameter>;
+
+typedef struct
+{
+	local int i;
+	for(i=0;i<header.expressionParameterCount;i++)
+	{
+		ExpressionParameterValue expressionParameter;
+	}
+
+}ExpressionParameterValues;
+typedef struct
+{
+	local uint currentEntryIndex = parentof(this).i;
+	uint boneNameHash;
+	uint unknBoneValue;
+}BoneValue<read=ReadBoneValue>;
+
+typedef struct
+{
+	local int i;
+	for(i=0;i<header.boneCount;i++)
+	{
+		BoneValue boneValue;
+	}
+
+}BoneValues;
+typedef struct
+{
+	local uint currentEntryIndex = parentof(this).i;
+	uint unkn0;
+	uint fieldParameterNameHash;
+	uint unkn2;
+	uint type;
+	uint unkn4;
+	if (type == 196) {
+		// RE8 - efd_0005_pl1000_bugs_00.efx
+		uint path_len;
+		wstring filePath;
+	} else {
+		uint unkn5;
+		if (Version > EfxVersion_RE7)
+		{
+			uint unkn6;
+			uint unkn7;
+			float unkn8;
+			float unkn9;
+			float unkn10;
+			if (type == 110 || type == 144 || type == 183 || type == 184 || type == 194 || type == 196 || type == 202 || type == 215)
+			{
+				uint pathUnicodeCharCount;
+				wstring filePath;
+			}
+		}
+	}
+}FieldParameterValue<read=ReadFieldParameter>;
+
+typedef struct
+{
+	local int i;
+	for(i=0;i<header.fieldParameterCount;i++)
+	{
+		FieldParameterValue fieldParameter;
+	}
+
+}FieldParameterValues;
+
+typedef struct
+{
+
+	if (exists(header.expressionParameterCount) && header.expressionParameterCount != 0)
+	{
+		ExpressionParameterValues expressionParameterValues;
+	}
+
+	if (Version > EfxVersion_DMC5 && header.boneCount != 0)
+	{
+		BoneValues boneValues;
+	}
+
+    if (Version > EfxVersion_DMC5)
+    {
+        struct
+	    {
+		    boneAttributeRelation relation[header.boneAttributeEntryCount]<read = ReadBoneAttributeRelation>;
+	    }boneAttributeRelations;
+    }
+
+
+}SubHeader<optimize = false,bgcolor=0xffdddd>;
+typedef struct
+{
+	uint actionUnkn0;
+	uint actionNameHash;
+	uint actionAttributeCount;
+	local int i;
+	for(i=0;i<actionAttributeCount;i++)//EFX attributes are sorted by their item type value
+	{
+		ReadEFXAttribute();
+        attribute[i].currentAttributeIndex = i;
+	}
+}Action;
+
+typedef struct
+{
+	local uint currentEntryIndex = parentof(this).i;
+	uint entryIndex;
+	uint effectNameHash;
+	enum EFXEntryHeaderEnum {AssignToCollisionEffect = 0, Root = 1, NoAssignment = 2} efxEntryAssignment;
+	int attributeCount<bgcolor=0x00dddd>;
+	local int i;
+	for(i=0;i<attributeCount;i++)//EFX attributes are sorted by their item type value
+	{
+		ReadEFXAttribute();
+        attribute[i].currentAttributeIndex = i;
+	}
+}EFXEntry<bgcolor=0x000000,read=ReadEFXEntry>;
+
+typedef struct
+{
+local int i;
+	for(i=0;i<header.entryCount;i++)
+	{
+		EFXEntry entry;
+	}
+}EFXEntries;
+typedef struct
+{
+	local uint currentEntryIndex = parentof(this).i;
+	uint conditionalEffectGroupNameHashUTF16;
+	uint conditionalEffectGroupNameHashUTF8;
+	uint valueCount;
+	uint efxEntryIndex[valueCount] <read=Str("%d: %s", this, parentof(parentof(parentof(this))).strings.efx_name[this].str)>;
+}EffectGroup<read=ReadCollisionEffect>;
+
+typedef struct
+{
+	local int i;
+	for(i=0;i<header.effectGroupCount;i++)
+	{
+		EffectGroup effectGroup<optimize=false>;
+	}
+
+}EffectGroups;
+
+typedef struct
+{
+	uint uvarStringCount;//This seems to be a count of uservariable strings on the end of the file
+	ubyte eof[4];
+
+	//Some files have the uvarString count higher than 0 but have no strings.
+	//Uncomment the section below to test it
+
+	/*
+	if (uvarStringCount != 0)
+	{
+		struct
+		{
+			uint stringLength;
+			wstring uvarString;
+		}uvarString[uvarStringCount]<optimize=false>;
+	}
+	*/
+}EOF<bgcolor=0x000000>;
+
+
+void updateBoneAttributeRelations(Header& header,SubHeader& subheader,EFXEntries& mainBody){
+	local int currentRelationIndex = 0;
+	local int i;
+	local int j;
+	//Printf("%i\n",header.entryCount);
+	for(i=0;i<header.entryCount;i++)
+	{
+		for(j=0;j<mainBody.entry[i].attributeCount;j++)
+		{
+			switch(GetEFXStructName(mainBody.entry[i].attribute[j].itemType))
+			{
+				case "ParentOptions":
+				case "VanishArea3D":
+				case "TypeStrainRibbon":
+				case "Attractor":
+				case "TypeLightning3D":
+				{
+					subheader.boneAttributeRelations.relation[currentRelationIndex].entryIndex = i;
+                    subheader.boneAttributeRelations.relation[currentRelationIndex].attributeIndex = j;
+					currentRelationIndex++;
+				}break;
+				default:
+				{
+
+				}
+			}
+		}
+	}
+};
+
+typedef struct
+{
+	Header header;
+    local int stringStartPos = FTell();
+	EntryNames strings<optimize=false>;
+    if (header.entryLength != FTell() - stringStartPos)
+    {
+        Warning("Warning - Entry length in header does not match actual entry length!");
+        Printf("Warning - Entry length in header does not match actual entry length!\nActual Length:%i\nExpected Length:%i\n",FTell()-stringStartPos,header.entryLength);
+    }
+
+	SubHeader subheader;
+	if (Version > EfxVersion_RE7 && header.actionCount != 0)
+	{
+		Action action[header.actionCount]<optimize=false, bgcolor=0x0000FF>;
+	}
+
+	if (exists(header.fieldParameterCount) && header.fieldParameterCount != 0)
+	{
+		FieldParameterValues fieldParameterValues<optimize=false, bgcolor=0xAAFFAA>;
+	}
+
+	if (Version <= EfxVersion_RE7 && header.actionCount != 0)
+	{
+		Action action[header.actionCount]<optimize=false, bgcolor=0x0000FF>;
+	}
+	EFXEntries mainBody;
+
+    if (Version > EfxVersion_DMC5)
+    {
+		updateBoneAttributeRelations(header,subheader,mainBody);
+    }
+	if (exists(header.effectGroupCount) && header.effectGroupCount != 0)
+	{
+		EffectGroups effectGroups<bgcolor=0xEEBBEE>;
+	}
+	if (exists(header.expressionParameterSize) && header.expressionParameterSize > 0) {
+		uint expressionParameterData[header.expressionParameterSize / 4];
+	}
+
+	if (Version > EfxVersion_DMC5) {
+		EOF eof;
+	}
+
+}EFXR<optimize=false>;
+
+//Presets for EFX Editor
+typedef struct
+{
+	uint magic;
+    uint presetVersion;
+    enum <uint>
+    {
+        Preset_Attribute = 0,
+        Preset_Entry = 1,
+        Preset_EntryGroup = 2
+    }presetType;
+    uint efxVersion;
+    //Version = efxVersion;
+    int expressionParameterCount;
+    int fieldParameterCount;
+    int entryCount;
+}EFXPresetHeader<bgcolor=0x7f21fa>;
+
+
+typedef struct
+{
+    uint stringLength;
+    wstring str;
+}PascalCString<read=ReadPascalCString>;
+
+string ReadPascalCString(PascalCString& input){
+	string s;
+	SPrintf(s, "%s", input.str);
+	return s;
+};
+typedef struct
+{
+
+    PascalCString presetName;
+    PascalCString presetCategory;
+    PascalCString presetDescription;
+    uint tagCount;
+    PascalCString tags[tagCount]<optimize = false>;
+    uint imageLength;
+    if (imageLength > 0)
+    {
+        ubyte imageData[imageLength]<optimize = false>;
+    }
+}EFXPresetInfo<bgcolor=0xf4d65c>;
+
+typedef struct
+{
+	if (header.expressionParameterCount != 0)
+    {
+        EntryName expression_parameter_name[header.expressionParameterCount];
+    }
+    if (header.fieldParameterCount != 0)
+    {
+        EntryName field_parameter_name[header.fieldParameterCount];
+    }
+    if (header.entryCount != 0)
+    {
+        EntryName efx_name[header.entryCount];
+    }
+}EFXPresetEntryNames;
+
+
+typedef struct
+{
+	EFXPresetHeader header;
+    EFXPresetInfo presetInfo;
+    if(header.presetType != 0)
+    {
+        EFXPresetEntryNames strings;
+    }
+    local int i = 0;
+    if (header.expressionParameterCount != 0)
+    {
+        ExpressionParameterValues expressionParameterValues;
+    }
+    if (header.fieldParameterCount != 0)
+    {
+        FieldParameterValues fieldParameterValues;
+    }
+
+    if (header.presetType == Preset_Attribute)
+    {
+        ReadEFXAttribute();
+    }
+    else
+    {
+        EFXEntries mainBody<optimize = false>;
+    }
+
+}EFXPreset;
+
+//EFX STRUCTS
+//#include "RE_EFX_STRUCTS.btx"
+#include "RE_EFX_STRUCTS.bt";
+
+//READ FUNCTIONS
+wstring ReadBoneAttributeRelation(boneAttributeRelation& input){
+	string s;
+	if (input.entryIndex != -999)
+	{
+		SPrintf(s, "%i, %s",input.boneNameIndex,parentof(parentof(parentof(input))).strings.efx_name[input.entryIndex].str);
+	    SPrintf(s, "%i, %s - %s",input.boneNameIndex,parentof(parentof(parentof(input))).strings.efx_name[input.entryIndex].str,GetEFXStructName(parentof(parentof(parentof(input))).mainBody.entry[input.entryIndex].attribute[input.attributeIndex].itemType));
+    }
+	else
+	{
+		s = "Failed to finish parsing efxr, it is likely that a struct that uses bones hasn't been marked as a struct that uses bones";
+	}
+	return StringToWString(s, CHARSET_UTF8);
+};
+
+wstring ReadStr(EntryName& input){
+	return StringToWString(input.str, CHARSET_UTF8);
+};
+string ReadVec3(Vec3& input){
+	string s;
+	SPrintf(s, "X:%f Y:%f Z:%f", input.x,input.y,input.z);
+	return s;
+};
+string ReadInt2(Int2& input){
+	string s;
+	SPrintf(s, "%i ~ %i", input.value,input.valueRandom);
+	return s;
+};
+string ReadInt3(Int3& input){
+	string s;
+	SPrintf(s, "X:%i Y:%i Z:%i", input.x,input.y,input.z);
+	return s;
+};
+string ReadColor(Color& input){
+	string s;
+	SPrintf(s, "RGBA: %u,%u,%u,%u", input.red,input.green,input.blue,input.alpha);
+	return s;
+};
+wstring ReadEFXEntry(EFXEntry& input){
+	string s;
+	SPrintf(s, "%s", parentof(parentof(input)).strings.efx_name[input.currentEntryIndex].str);
+	return StringToWString(s, CHARSET_UTF8);
+	//return s;
+};
+string ReadFieldParameter(FieldParameterValue& input){
+	string s;
+	SPrintf(s, "%s", parentof(parentof(input)).strings.field_parameter_name[input.currentEntryIndex].str);
+	return s;
+};
+string ReadExpressionParameter(ExpressionParameterValue& input){
+	string s;
+	SPrintf(s, "%s", parentof(parentof(parentof(input))).strings.expression_parameter_name[input.currentEntryIndex].str);
+	return s;
+};
+string ReadBoneValue(BoneValue& input){
+	string s;
+	SPrintf(s, "%s", parentof(parentof(parentof(input))).strings.bone_name[input.currentEntryIndex].str);
+	return s;
+};
+string ReadCollisionEffect(EffectGroup& input){
+	string s;
+	SPrintf(s, "%s", parentof(parentof(input)).strings.collision_effect_name[input.currentEntryIndex].str);
+	return s;
+};
+
+//STRUCT READ FUNCTIONS
+string getPtBehaviorEnumValue(string enumName,uint enumValue)
+{
+    string name;
+    switch(enumName)
+    {
+        case "snow.wwise.SnowSoundEffectTypeEvent._Type":
+        {
+            switch(enumValue)
+            {
+                case 0:{name="Fire";break;}
+                case 1:{name="Water";break;}
+                case 2:{name="Elec";break;}
+                case 3:{name="Ice";break;}
+                case 4:{name="Dragon";break;}
+                case 5:{name="Poison";break;}
+                case 6:{name="Paralyze";break;}
+                case 7:{name="Sleep";break;}
+                case 8:{name="StaminaDown";break;}
+                case 9:{name="Blast";break;}
+                case 10:{name="BlastLv2";break;}
+                case 11:{name="Pooh";break;}
+                case 12:{name="Anesthesia";break;}
+                case 13:{name="Critical";break;}
+                case 14:{name="Negative";break;}
+                case 15:{name="Stun";break;}
+                case 16:{name="Mystery";break;}
+                default:{name="Unknown Enum Value";break;}
+
+            }
+            break;
+        }
+        default:
+        {
+            name = "Unknown Enum";
+        }
+    }
+    return name;
+}
+
+string ReadPtBehaviorEnum(uint& input){
+	string s;
+    SPrintf(s, "%s.%s",parentof(parentof(input)).behaviorString,parentof(input).behaviorPropertyString);
+    SPrintf(s, "%i (%s)",input,getPtBehaviorEnumValue(s,input));
+	return s;
+};
+
+
+
+void writeErrorToFile(int errorNum)//debug
+{
+	if (errorNum == 999)
+	{
+		uint32 STRUCT_ERROR<bgcolor=0x0000FF,fgcolor=0x000000,comment="One of the previous structs is wrong. If this is an unchanged file, please report it.">;
+		uint32 nextByte<bgcolor=0x0000FF,fgcolor=0x000000,comment="One of the previous structs is wrong. If this is an unchanged file, please report it.">;
+		UndeterminedFieldType remainingBytes[(FileSize() - FTell()) / 4];
+	}
+	else
+	{
+		uint32 UNMAPPED_STRUCT<bgcolor=0x0000FF,fgcolor=0x000000,comment="Struct ID is unmapped. Check that the previous struct is correct before mapping it.">;
+		uint32 nextByte<bgcolor=0x0000FF,fgcolor=0x000000,comment="One of the previous structs is wrong. If this is an unchanged file, please report it.">;
+	}
+	Exit(errorNum);
+}
+
+//HASHING
+//Murmur3 hash generation by Darkness:
+uint32 fmix32(uint32 h){
+    h ^= h >> 16;
+    h *= 0x85ebca6b;
+    h ^= h >> 13;
+    h *= 0xc2b2ae35;
+    h ^= h >> 16;
+    return h;
+}
+
+uint32 mmh3 (byte key[], uint32 length , uint32 seed){
+    local uint64 block_start<hidden=true>;
+    local const uint nBlocks = length / 4;
+    local uint32 h1 = seed;
+
+    local const uint32 c1 = 0xcc9e2d51;
+    local const uint32 c2 = 0x1b873593;
+
+    local uint32 k1;
+    for(block_start = 0; block_start < nBlocks * 4; block_start+= 4){
+        k1 = (uint32)key[block_start + 3] << 24 | \
+             (uint32)key[block_start + 2] << 16 | \
+             (uint32)key[block_start + 1] << 8 | \
+             (uint32)key[block_start + 0];
+
+        k1 = (c1 * k1) & 0xFFFFFFFF;
+        k1 = (k1 << 15 | k1 >> 17) & 0xFFFFFFFF;
+        k1 = (c2 * k1) & 0xFFFFFFFF;
+
+        h1 ^= k1;
+        h1 = (h1 << 13 | h1 >> 19) & 0xFFFFFFFF;
+        h1 = (h1 * 5 + 0xe6546b64) & 0xFFFFFFFF;
+    }
+
+    local uint32 tail_index = nBlocks * 4;
+    k1 = 0;
+    local uint32 tail_size = length & 3;
+
+    if(tail_size >= 3)
+        k1 ^= (uint32)key[tail_index + 2] << 16;
+    if(tail_size >= 2)
+        k1 ^= (uint32)key[tail_index + 1] << 8;
+    if(tail_size >= 1)
+        k1 ^= (uint32)key[tail_index + 0];
+
+    if(tail_size > 0){
+        k1 = (k1 * c1) & 0xFFFFFFFF;
+        k1 = (k1 << 15 | k1 >> 17) & 0xFFFFFFFF;
+        k1 = (k1 * c2) & 0xFFFFFFFF;
+        h1 ^= k1;
+    }
+
+    return fmix32(h1 ^ length);
+}
+
+uint32 hash_ascii(string key){
+    local uint64 it<hidden=true>;
+    local const uint length = Strlen(key);
+    if (length) {
+        local byte key_array[length];
+        for(it = 0; it < length; it ++){
+            key_array[it] = key[it];
+        }
+        return mmh3(key_array, length, 0xFFFFFFFF);
+    } return 0;
+}
+
+uint32 hash_wide(string key){
+    local uint64 it<hidden=true>;
+    local const uint length = Strlen(key) * 2;
+    if (length) {
+        local byte key_array[length];
+        for(it = 0; it < length; it += 2){
+            key_array[it] = key[it / 2];
+            key_array[it + 1] = 0;
+        }
+        return mmh3(key_array, length, 0xFFFFFFFF);
+    } return 0;
+}
+
+
+//DISPLAY
+
+if (ReadUInt() == 4281166)
+{
+    EFXPreset preset<optimize = false>;
+    Printf("EFX Preset File: %s\n",preset.presetInfo.presetName.str);
+    Printf("EFX Version: %i\n\n",preset.header.efxVersion);
+}
+else
+{
+    EFXR main_efxr<optimize = false>;
+	if (FTell() < FileSize()) UndeterminedFieldType remainingBytes[(FileSize() - FTell()) / 4];
+}
+Printf("Template finished executing.");
