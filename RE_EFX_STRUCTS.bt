@@ -49,8 +49,7 @@ typedef struct FloatWithColor_t {
 	Color color;
 } FloatWithColor ;
 
-typedef struct EfxHeader
-{
+typedef struct {
 	int magic;
 	int ukn;
 	int entryCount;
@@ -69,10 +68,22 @@ typedef struct EfxHeader
 		int uknFlag;
 	}
 
-};
+}EfxHeader<read="[EfxHeader]">;
 
-typedef struct EfxClipDataBase
-{
+typedef struct {
+	if (uvarType == 2) { // end at: path
+		int len_path;
+		wstring path;
+	}
+
+	if (uvarType == 2) { // end at: group
+		int len_group;
+		wstring group;
+	}
+
+}EFXUvarGroup<read="[EFXUvarGroup]">;
+
+typedef struct {
 	EfxClipPlaybackType loopType;
 	float clipDuration;
 	int clipCount;
@@ -84,10 +95,9 @@ typedef struct EfxClipDataBase
 	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
 	if (frameCount > 0) TClipFrameType frames[frameCount] <optimize=false>;
 	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
-};
+}EfxClipDataBase<read="[EfxClipDataBase]">;
 
-typedef struct EfxClipData
-{
+typedef struct {
 	EfxClipPlaybackType loopType;
 	float clipDuration;
 	int clipCount;
@@ -99,10 +109,9 @@ typedef struct EfxClipData
 	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
 	if (frameCount > 0) TClipFrameType frames[frameCount] <optimize=false>;
 	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
-};
+}EfxClipData<read="[EfxClipData]">;
 
-typedef struct EfxColorClipData
-{
+typedef struct {
 	EfxClipPlaybackType loopType;
 	float clipDuration;
 	int clipCount;
@@ -114,10 +123,9 @@ typedef struct EfxColorClipData
 	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
 	if (frameCount > 0) TClipFrameType frames[frameCount] <optimize=false>;
 	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
-};
+}EfxColorClipData<read="[EfxColorClipData]">;
 
-typedef struct EfxMaterialClipData
-{
+typedef struct {
 	EfxClipPlaybackType loopType;
 	float clipDuration;
 	int clipCount;
@@ -142,11 +150,11 @@ typedef struct EfxMaterialClipData
 		if (indicesCount > 0) uint indices[indicesCount] <optimize=false>;
 	}
 
-};
+}EfxMaterialClipData<read="[EfxMaterialClipData]">;
 
-typedef struct Spawn_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint maxParticles;
@@ -206,11 +214,15 @@ typedef struct Spawn_DMC5
 		}
 	}
 
-};
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn_toggle
+		ubyte mhws_unkn_toggle;
+	}
 
-typedef struct SpawnExpression_RE3
-{    local int currentAttributeIndex = -1;
+}Spawn_DMC5<read="[Spawn]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(7);
@@ -228,11 +240,11 @@ typedef struct SpawnExpression_RE3
 	}
 
 	EFXExpressionList expressions;
-};
+}SpawnExpression_RE3<read="[SpawnExpression]">;
 
-typedef struct ParentOptions_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	Int3 RelationPos;
@@ -255,11 +267,11 @@ typedef struct ParentOptions_RE7
 
 	int len_boneName;
 	wstring boneName;
-};
+}ParentOptions_RE7<read="[ParentOptions]">;
 
-typedef struct ParentOptionsExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(7);
@@ -271,11 +283,11 @@ typedef struct ParentOptionsExpression_DD2
 	ExpressionAssignType unkn1_6;
 	ExpressionAssignType unkn1_7;
 	EFXExpressionList expressions;
-};
+}ParentOptionsExpression_DD2<read="[ParentOptionsExpression]">;
 
-typedef struct Life_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	Int2 AppearFrameRange;
@@ -287,11 +299,11 @@ typedef struct Life_RE7
 		uint unkn9;
 	}
 
-};
+}Life_RE7<read="[Life]">;
 
-typedef struct LifeExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(6);
@@ -311,10 +323,9 @@ typedef struct LifeExpression_RE7
 	}
 
 	EFXExpressionList expressions;
-};
+}LifeExpression_RE7<read="[LifeExpression]">;
 
-typedef struct TextureUnitData
-{
+typedef struct {
 	uint unkn1;
 	Color color;
 	float unkn3;
@@ -354,11 +365,11 @@ typedef struct TextureUnitData
 	UndeterminedFieldType unkn37;
 	float unkn38;
 	float unkn39;
-};
+}TextureUnitData<read="[TextureUnitData]">;
 
-typedef struct TextureUnit_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -371,31 +382,31 @@ typedef struct TextureUnit_DMC5
 	wstring uvs0Path;
 	wstring uvs1Path;
 	wstring uvs2Path;
-};
+}TextureUnit_DMC5<read="[TextureUnit]">;
 
-typedef struct TextureUnitExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(114);
 	ExpressionAssignType assignTypes[114] <optimize=false>;
 	EFXExpressionList expressions;
-};
+}TextureUnitExpression_DD2<read="[TextureUnitExpression]">;
 
-typedef struct TextureFilter_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1;
 	float unkn2;
 	float unkn3;
-};
+}TextureFilter_RE4<read="[TextureFilter]">;
 
-typedef struct UVScroll_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -411,11 +422,11 @@ typedef struct UVScroll_RE4
 	float unkn1_10;
 	float unkn1_11;
 	float unkn1_12;
-};
+}UVScroll_RE4<read="[UVScroll]">;
 
-typedef struct UVSequence_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -427,11 +438,11 @@ typedef struct UVSequence_DMC5
 	uint mode;
 	int len_uvsPath;
 	wstring uvsPath;
-};
+}UVSequence_DMC5<read="[UVSequence]">;
 
-typedef struct UVSequenceModifier_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -441,11 +452,11 @@ typedef struct UVSequenceModifier_RE4
 	float minSpeedRandom;
 	float maxSpeed;
 	float maxSpeedRandom;
-};
+}UVSequenceModifier_RE4<read="[UVSequenceModifier]">;
 
-typedef struct UVSequenceExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(6);
@@ -456,11 +467,11 @@ typedef struct UVSequenceExpression_DMC5
 	ExpressionAssignType unkn5;
 	ExpressionAssignType unkn6;
 	EFXExpressionList expressions;
-};
+}UVSequenceExpression_DMC5<read="[UVSequenceExpression]">;
 
-typedef struct AlphaCorrection_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version >= EfxVersion_RE2) { // end at: unkn1
@@ -470,11 +481,11 @@ typedef struct AlphaCorrection_RE7
 	float unkn2_0;
 	float unkn2_1;
 	float unkn2_2;
-};
+}AlphaCorrection_RE7<read="[AlphaCorrection]">;
 
-typedef struct ShaderSettings_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1;
@@ -570,7 +581,7 @@ typedef struct ShaderSettings_RE7
 			uint unkn24;
 		}
 
-		if (Version >= EfxVersion_RERT) { // end at: unkn29
+		if (Version >= EfxVersion_RERT && Version < EfxVersion_MHWilds) { // end at: unkn29
 			uint unkn25;
 			uint unkn26;
 			uint unkn27;
@@ -579,11 +590,17 @@ typedef struct ShaderSettings_RE7
 		}
 	}
 
-};
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn_short
+		float mhws_unkn1;
+		float mhws_unkn2;
+		short mhws_unkn_short;
+	}
 
-typedef struct ShaderSettingsExpression_DMC5
-{    local int currentAttributeIndex = -1;
+}ShaderSettings_RE7<read="[ShaderSettings]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(12);
@@ -606,43 +623,37 @@ typedef struct ShaderSettingsExpression_DMC5
 	}
 
 	EFXExpressionList expressions;
-};
+}ShaderSettingsExpression_DMC5<read="[ShaderSettingsExpression]">;
 
-typedef struct PlayEfx_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn
-		uint mhws_unkn;
-	}
 
 	int len_efxPath;
 	wstring efxPath;
-};
+}PlayEfx_DMC5<read="[PlayEfx]">;
 
-typedef struct PlayEmitter_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-	if (Version >= EfxVersion_MHWilds) uint mhws_unkn;
 	uint efxrSize;
 	if (efxrSize > 0) EFXR embedded_efxr <optimize=false>;
-};
+}PlayEmitter_DMC5<read="[PlayEmitter]">;
 
-typedef struct RenderTarget_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn_toggle;
 	int len_rtexPath;
 	wstring rtexPath;
-};
+}RenderTarget_DMC5<read="[RenderTarget]">;
 
-typedef struct MdfProperty
-{
+typedef struct {
 	uint PropertyNameUTF8Hash;
 	if (Version >= EfxVersion_RE3) { // end at: mdfPropertyIndex
 		int mdfPropertyIndex;
@@ -659,14 +670,12 @@ typedef struct MdfProperty
 	}
 
 	ubyte propertyValue[16] <optimize=false>;
-};
+}MdfProperty<read="[MdfProperty]">;
 
-typedef struct EfxMaterialStructBase
-{
-};
+typedef struct {
+}EfxMaterialStructBase<read="[EfxMaterialStructBase]">;
 
-typedef struct EfxMaterialStructV1
-{
+typedef struct {
 	int maxPropertyIndex;
 	int ukn1;
 	int propertyCount;
@@ -679,11 +688,14 @@ typedef struct EfxMaterialStructV1
 	wstring mdfPath;
 	wstring mmtrPath;
 	if (texCount > 0) struct { wstring str; } texPaths[texCount] <read=str,optimize=false>;
-};
+}EfxMaterialStructV1<read="[EfxMaterialStructV1]">;
 
-typedef struct EfxMaterialStructV2
-{
+typedef struct {
 	uint ukn1;
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn
+		float mhws_unkn;
+	}
+
 	int propertyCount;
 	int texCount;
 	uint ukn2;
@@ -697,38 +709,38 @@ typedef struct EfxMaterialStructV2
 	if (propertyCount > 0) MdfProperty properties[propertyCount] <optimize=false>;
 	uint texBlockSize;
 	if (texCount > 0) struct { wstring str; } texPaths[texCount] <read=str,optimize=false>;
-};
+}EfxMaterialStructV2<read="[EfxMaterialStructV2]">;
 
-typedef struct EmitterColor_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
 	uint unkn2;
 	Color color;
-};
+}EmitterColor_RE4<read="[EmitterColor]">;
 
-typedef struct EmitterColorClip_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(4);
 	uint unkn1;
 	EfxColorClipData clipData;
-};
+}EmitterColorClip_RE4<read="[EmitterColorClip]">;
 
-typedef struct EmitterPriority_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-};
+}EmitterPriority_DMC5<read="[EmitterPriority]">;
 
-typedef struct EmitterShape2D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
@@ -739,11 +751,11 @@ typedef struct EmitterShape2D_DMC5
 	uint unkn1_5;
 	uint unkn1_6;
 	float unkn1_7;
-};
+}EmitterShape2D_DMC5<read="[EmitterShape2D]">;
 
-typedef struct EmitterShape2DExpression_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(5);
@@ -753,11 +765,11 @@ typedef struct EmitterShape2DExpression_RE4
 	ExpressionAssignType unkn4;
 	ExpressionAssignType unkn5;
 	EFXExpressionList expressions;
-};
+}EmitterShape2DExpression_RE4<read="[EmitterShape2DExpression]">;
 
-typedef struct EmitterShape3D_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float RangeXMin;
@@ -794,11 +806,11 @@ typedef struct EmitterShape3D_RERT
 		float unkn4_3;
 	}
 
-};
+}EmitterShape3D_RERT<read="[EmitterShape3D]">;
 
-typedef struct EmitterShape3DExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(9);
@@ -818,20 +830,20 @@ typedef struct EmitterShape3DExpression_RE7
 	}
 
 	EFXExpressionList expressions;
-};
+}EmitterShape3DExpression_RE7<read="[EmitterShape3DExpression]">;
 
-typedef struct ScreenSpaceEmitter_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
 	uint unkn1;
-};
+}ScreenSpaceEmitter_RE8<read="[ScreenSpaceEmitter]">;
 
-typedef struct MeshEmitter_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	ubyte unkn0_1;
@@ -890,21 +902,21 @@ typedef struct MeshEmitter_DMC5
 		wstring name;
 	}
 
-};
+}MeshEmitter_DMC5<read="[MeshEmitter]">;
 
-typedef struct MeshEmitterClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(9);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}MeshEmitterClip_DMC5<read="[MeshEmitterClip]">;
 
-typedef struct MeshEmitterExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(16);
@@ -925,11 +937,11 @@ typedef struct MeshEmitterExpression_DMC5
 	ExpressionAssignType unkn15;
 	ExpressionAssignType unkn16;
 	EFXExpressionList expressions;
-};
+}MeshEmitterExpression_DMC5<read="[MeshEmitterExpression]">;
 
-typedef struct FadeByAngle_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -939,33 +951,33 @@ typedef struct FadeByAngle_DMC5
 	float unkn1_4;
 	float unkn1_5;
 	float unkn1_6;
-};
+}FadeByAngle_DMC5<read="[FadeByAngle]">;
 
-typedef struct FadeByAngleExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(2);
 	ExpressionAssignType minAngle;
 	ExpressionAssignType maxAngle;
 	EFXExpressionList expressions;
-};
+}FadeByAngleExpression_DMC5<read="[FadeByAngleExpression]">;
 
-typedef struct FadeByDepth_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float nearStart;
 	float nearEnd;
 	float farStart;
 	float farEnd;
-};
+}FadeByDepth_DMC5<read="[FadeByDepth]">;
 
-typedef struct FadeByDepthExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(4);
@@ -974,11 +986,11 @@ typedef struct FadeByDepthExpression_DMC5
 	ExpressionAssignType farStart;
 	ExpressionAssignType farEnd;
 	EFXExpressionList expressions;
-};
+}FadeByDepthExpression_DMC5<read="[FadeByDepthExpression]">;
 
-typedef struct FadeByEmitterAngle_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -991,22 +1003,45 @@ typedef struct FadeByEmitterAngle_DMC5
 		UndeterminedFieldType unkn1_6;
 	}
 
-};
+}FadeByEmitterAngle_DMC5<read="[FadeByEmitterAngle]">;
 
-typedef struct FadeByOcclusion_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1;
 	uint unkn2;
 	float unkn3;
 	float unkn4;
-};
+}FadeByOcclusion_DMC5<read="[FadeByOcclusion]">;
 
-typedef struct VectorFieldParameter_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint null1;
+	float unkn2;
+	float unkn3;
+	float unkn4;
+	float null5;
+	float unkn6;
+	float unkn7;
+	float unkn8;
+	float unkn9;
+	float unkn10;
+	float unkn11;
+	float unkn12;
+	float null13;
+	float null14;
+	float null15;
+	uint unkn16;
+}FadeByRootCulling_DD2<read="[FadeByRootCulling]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
@@ -1032,21 +1067,21 @@ typedef struct VectorFieldParameter_RE2
 
 	uint unkn1_18;
 	int unkn1_19;
-};
+}VectorFieldParameter_RE2<read="[VectorFieldParameter]">;
 
-typedef struct VectorFieldParameterClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(13);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}VectorFieldParameterClip_DMC5<read="[VectorFieldParameterClip]">;
 
-typedef struct VectorFieldParameterExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(20);
@@ -1074,11 +1109,11 @@ typedef struct VectorFieldParameterExpression_DMC5
 	}
 
 	EFXExpressionList expressions;
-};
+}VectorFieldParameterExpression_DMC5<read="[VectorFieldParameterExpression]">;
 
-typedef struct GlobalVectorField_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -1092,11 +1127,11 @@ typedef struct GlobalVectorField_RE8
 	UndeterminedFieldType unkn9;
 	UndeterminedFieldType unkn10;
 	UndeterminedFieldType unkn11;
-};
+}GlobalVectorField_RE8<read="[GlobalVectorField]">;
 
-typedef struct DirectionalFieldParameter_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -1113,11 +1148,11 @@ typedef struct DirectionalFieldParameter_RE8
 	UndeterminedFieldType unkn12;
 	float unkn13;
 	UndeterminedFieldType unkn14;
-};
+}DirectionalFieldParameter_RE8<read="[DirectionalFieldParameter]">;
 
-typedef struct FluidEmitter2D_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -1142,22 +1177,22 @@ typedef struct FluidEmitter2D_RE7
 		float unkn11;
 	}
 
-};
+}FluidEmitter2D_RE7<read="[FluidEmitter2D]">;
 
-typedef struct FluidEmitter2DExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(2);
 	ExpressionAssignType unkn2;
 	ExpressionAssignType unkn3;
 	EFXExpressionList expressions;
-};
+}FluidEmitter2DExpression_DD2<read="[FluidEmitter2DExpression]">;
 
-typedef struct FluidSimulator2D_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	ubyte unkn0_1;
@@ -1306,11 +1341,11 @@ typedef struct FluidSimulator2D_RE2
 		if (re4_unk3_3 > 0) FloatWithColor gradient[re4_unk3_3] <optimize=false>;
 	}
 
-};
+}FluidSimulator2D_RE2<read="[FluidSimulator2D]">;
 
-typedef struct DepthOperator_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -1323,20 +1358,28 @@ typedef struct DepthOperator_RE2
 	if (Version >= EfxVersion_RE4) { // end at: unkn12
 		float unkn4;
 		UndeterminedFieldType unkn5;
+		if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn1
+			float mhws_unkn1;
+		}
+
 		float unkn6;
 		UndeterminedFieldType unkn7;
 		float unkn8;
 		UndeterminedFieldType unkn9;
 		float radians10;
+		if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn2
+			UndeterminedFieldType mhws_unkn2;
+		}
+
 		float unkn11;
 		UndeterminedFieldType unkn12;
 	}
 
-};
+}DepthOperator_RE2<read="[DepthOperator]">;
 
-typedef struct Distortion_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	DistortionType distortionType;
@@ -1354,11 +1397,11 @@ typedef struct Distortion_RE7
 		ubyte dd2_unkn2;
 	}
 
-};
+}Distortion_RE7<read="[Distortion]">;
 
-typedef struct DistortionExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(5);
@@ -1368,11 +1411,11 @@ typedef struct DistortionExpression_DD2
 	ExpressionAssignType unkn4;
 	ExpressionAssignType unkn5;
 	EFXExpressionList expressions;
-};
+}DistortionExpression_DD2<read="[DistortionExpression]">;
 
-typedef struct ProceduralDistortion_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version >= EfxVersion_RE4) { // end at: unkn0
@@ -1400,31 +1443,57 @@ typedef struct ProceduralDistortion_RE4
 	}
 
 	float unkn18;
-};
+}ProceduralDistortion_RE4<read="[ProceduralDistortion]">;
 
-typedef struct ProceduralDistortionDelayFrame_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	UndeterminedFieldType unkn;
-};
+}ProceduralDistortionDelayFrame_RE4<read="[ProceduralDistortionDelayFrame]">;
 
-typedef struct ProceduralDistortionClip_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-	BitSet clipBits(1);
-	uint unkn1;
-	int unkn2;
+	BitSet clipBits(7);
+	UndeterminedFieldType unkn1;
 	EfxClipData clipData;
-};
+}ProceduralDistortionClip_RE4<read="[ProceduralDistortionClip]">;
 
-typedef struct FakeDoF_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	BitSet expressionBits(18);
+	ExpressionAssignType unkn1;
+	ExpressionAssignType unkn2;
+	ExpressionAssignType unkn3;
+	ExpressionAssignType unkn4;
+	ExpressionAssignType unkn5;
+	ExpressionAssignType unkn6;
+	ExpressionAssignType unkn7;
+	ExpressionAssignType unkn8;
+	ExpressionAssignType unkn9;
+	ExpressionAssignType unkn10;
+	ExpressionAssignType unkn11;
+	ExpressionAssignType unkn12;
+	ExpressionAssignType unkn13;
+	ExpressionAssignType unkn14;
+	ExpressionAssignType unkn15;
+	ExpressionAssignType unkn16;
+	ExpressionAssignType unkn17;
+	ExpressionAssignType unkn18;
+	EFXExpressionList expressions;
+}ProceduralDistortionExpression_DD2<read="[ProceduralDistortionExpression]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn0;
@@ -1432,11 +1501,11 @@ typedef struct FakeDoF_DMC5
 	float unkn2;
 	uint unkn3;
 	float unkn4;
-};
+}FakeDoF_DMC5<read="[FakeDoF]">;
 
-typedef struct WindInfluence3D_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1;
@@ -1445,28 +1514,28 @@ typedef struct WindInfluence3D_RE8
 	float unkn4;
 	uint unkn5;
 	uint unkn6;
-};
+}WindInfluence3D_RE8<read="[WindInfluence3D]">;
 
-typedef struct WindInfluence3DDelayFrame_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn2;
-};
+}WindInfluence3DDelayFrame_DD2<read="[WindInfluence3DDelayFrame]">;
 
-typedef struct DepthOcclusion_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn;
-};
+}DepthOcclusion_RE8<read="[DepthOcclusion]">;
 
-typedef struct PlaneCollider_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -1485,11 +1554,11 @@ typedef struct PlaneCollider_RE8
 	UndeterminedFieldType unkn14;
 	uint unkn15;
 	uint unkn16;
-};
+}PlaneCollider_RE8<read="[PlaneCollider]">;
 
-typedef struct FixRandomGenerator_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -1507,11 +1576,11 @@ typedef struct FixRandomGenerator_DMC5
 		}
 	}
 
-};
+}FixRandomGenerator_DMC5<read="[FixRandomGenerator]">;
 
-typedef struct EffectOptimizeShader_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unknShaderCRCHash0;
@@ -1535,15 +1604,21 @@ typedef struct EffectOptimizeShader_DD2
 	uint unknShaderCRCHash16;
 	uint unknShaderCRCHash17;
 	UndeterminedFieldType unkn18;
-	uint unknShaderCRCHash19;
-	Color unkn20;
+	if (Version >= EfxVersion_MHWilds) { // end at: unknShaderCRCHash20
+		uint unknShaderCRCHash18;
+		uint unknShaderCRCHash19;
+		uint unknShaderCRCHash20;
+	}
+
+	uint unknShaderCRCHash21;
+	ByteSet unkn20;
 	int len_shaderPath;
 	wstring shaderPath;
-};
+}EffectOptimizeShader_DD2<read="[EffectOptimizeShader]">;
 
-typedef struct Attractor_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -1562,21 +1637,21 @@ typedef struct Attractor_RERT
 
 	int len_boneName;
 	wstring boneName;
-};
+}Attractor_RERT<read="[Attractor]">;
 
-typedef struct AttractorClip_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(7);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}AttractorClip_RE8<read="[AttractorClip]">;
 
-typedef struct AttractorExpression_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(10);
@@ -1591,11 +1666,11 @@ typedef struct AttractorExpression_RE4
 	ExpressionAssignType unkn9;
 	ExpressionAssignType unkn10;
 	EFXExpressionList expressions;
-};
+}AttractorExpression_RE4<read="[AttractorExpression]">;
 
-typedef struct Blink_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version >= EfxVersion_DD2) { // end at: dd2_unkn1
@@ -1612,11 +1687,11 @@ typedef struct Blink_RE4
 	float unkn1_7;
 	float unkn1_8;
 	float unkn1_9;
-};
+}Blink_RE4<read="[Blink]">;
 
-typedef struct ColorGrading_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	Color color0;
@@ -1625,11 +1700,11 @@ typedef struct ColorGrading_RE4
 	float unkn1_1;
 	float unkn1_2;
 	float unkn1_3;
-};
+}ColorGrading_RE4<read="[ColorGrading]">;
 
-typedef struct ContrastHighlighter_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
@@ -1638,36 +1713,36 @@ typedef struct ContrastHighlighter_RE4
 	float unkn1_3;
 	uint unkn1_4;
 	float unkn1_5;
-};
+}ContrastHighlighter_RE4<read="[ContrastHighlighter]">;
 
-typedef struct DrawOverlay_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0_0;
 	uint unkn0_1;
 	uint unkn0_2;
-};
+}DrawOverlay_DMC5<read="[DrawOverlay]">;
 
-typedef struct EmitMask_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-	uint unkn1;
-};
+	uint mask;
+}EmitMask_RE4<read="[EmitMask]">;
 
-typedef struct IgnorePlayerColor_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-};
+}IgnorePlayerColor_RE2<read="[IgnorePlayerColor]">;
 
-typedef struct LuminanceBleed_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -1680,11 +1755,11 @@ typedef struct LuminanceBleed_RERT
 	float unkn4;
 	float unkn5;
 	float unkn6;
-};
+}LuminanceBleed_RERT<read="[LuminanceBleed]">;
 
-typedef struct Noise_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
@@ -1695,11 +1770,11 @@ typedef struct Noise_RE4
 	float unkn1_5;
 	float unkn1_6;
 	float unkn1_7;
-};
+}Noise_RE4<read="[Noise]">;
 
-typedef struct NoiseExpression_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(8);
@@ -1712,11 +1787,11 @@ typedef struct NoiseExpression_RE4
 	ExpressionAssignType unkn7;
 	ExpressionAssignType unkn8;
 	EFXExpressionList expressions;
-};
+}NoiseExpression_RE4<read="[NoiseExpression]">;
 
-typedef struct StretchBlur_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint blurRotation;
@@ -1731,11 +1806,11 @@ typedef struct StretchBlur_RE4
 	float unkn10;
 	float unkn11;
 	float unkn12;
-};
+}StretchBlur_RE4<read="[StretchBlur]">;
 
-typedef struct TexelChannelOperator_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
@@ -1755,11 +1830,11 @@ typedef struct TexelChannelOperator_RE4
 	uint unkn1_14;
 	uint unkn1_15;
 	uint unkn1_16;
-};
+}TexelChannelOperator_RE4<read="[TexelChannelOperator]">;
 
-typedef struct VanishArea3D_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -1776,11 +1851,11 @@ typedef struct VanishArea3D_RE4
 	float unkn1_11;
 	int len_boneName;
 	wstring boneName;
-};
+}VanishArea3D_RE4<read="[VanishArea3D]">;
 
-typedef struct VanishArea3DExpression_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(14);
@@ -1799,20 +1874,247 @@ typedef struct VanishArea3DExpression_RE4
 	ExpressionAssignType unkn13;
 	ExpressionAssignType unkn14;
 	EFXExpressionList expressions;
-};
+}VanishArea3DExpression_RE4<read="[VanishArea3DExpression]">;
 
-typedef struct TexelChannelOperatorClip_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(2);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}TexelChannelOperatorClip_RE4<read="[TexelChannelOperatorClip]">;
 
-typedef struct PtBehaviorVariableDataBase
-{
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	Color color1;
+	Color color2;
+	float unkn3;
+	float unkn4;
+	float unkn5;
+	Color color3;
+	Color color4;
+	float unkn8;
+	float unkn9;
+	float unkn10;
+	ubyte ukn2_0;
+	uint ukn2_1;
+	uint ukn2_2;
+	uint ukn2_3;
+	uint ukn2_4;
+	uint ukn2_5;
+	uint ukn2_6;
+	ubyte ukn3_0;
+	uint ukn3_1;
+	ubyte ukn4_0;
+	uint ukn4_1;
+	uint ukn4_2;
+	uint ukn4_3;
+	uint ukn4_4;
+	uint ukn4_5;
+	uint ukn4_6;
+	ubyte ukn5_0;
+	uint ukn5_1;
+}RgbCommon_RE4<read="[RgbCommon]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	BitSet expressionBits(13);
+	ExpressionAssignType particleColor;
+	ExpressionAssignType unkn2;
+	ExpressionAssignType colorIntensityGreen;
+	ExpressionAssignType colorSaturate;
+	ExpressionAssignType unkn5;
+	ExpressionAssignType particleColor2;
+	ExpressionAssignType unkn7;
+	ExpressionAssignType colorIntensityRed;
+	ExpressionAssignType alpha1;
+	ExpressionAssignType alpha2;
+	ExpressionAssignType unkn11;
+	ExpressionAssignType unkn12;
+	ExpressionAssignType unkn13;
+	ExpressionAssignType unkn14;
+	ExpressionAssignType unkn15;
+	ExpressionAssignType unkn16;
+	ExpressionAssignType unkn17;
+	ExpressionAssignType unkn18;
+	ExpressionAssignType unkn19;
+	ExpressionAssignType unkn20;
+	ExpressionAssignType unkn21;
+	ExpressionAssignType unkn22;
+	EFXExpressionList expressions;
+}RgbCommonExpression_DD2<read="[RgbCommonExpression]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	ByteSet unkn0;
+	float unkn1;
+	ByteSet unkn2;
+	float unkn3;
+	float unkn4;
+	float unkn5;
+	ubyte toggle_b1;
+	uint unkn6;
+	UndeterminedFieldType unkn7;
+	uint unkn8;
+	UndeterminedFieldType unkn9;
+	ubyte toggle_b2;
+	UndeterminedFieldType unkn10;
+	UndeterminedFieldType unkn11;
+	UndeterminedFieldType unkn12;
+	UndeterminedFieldType unkn13;
+	UndeterminedFieldType unkn14;
+	uint unkn15;
+	UndeterminedFieldType unkn16;
+	uint unkn17;
+	UndeterminedFieldType unkn18;
+	UndeterminedFieldType unkn19;
+	ubyte toggle_b3;
+	UndeterminedFieldType unkn20;
+	UndeterminedFieldType unkn21;
+	uint unkn22;
+	UndeterminedFieldType unkn23;
+	uint unkn24;
+	UndeterminedFieldType unkn25;
+	UndeterminedFieldType unkn26;
+}RgbWater_DD2<read="[RgbWater]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	BitSet expressionBits(13);
+	ExpressionAssignType particleColor;
+	ExpressionAssignType unkn2;
+	ExpressionAssignType colorIntensityGreen;
+	ExpressionAssignType colorSaturate;
+	ExpressionAssignType unkn5;
+	ExpressionAssignType particleColor2;
+	ExpressionAssignType unkn7;
+	ExpressionAssignType colorIntensityRed;
+	ExpressionAssignType alpha1;
+	ExpressionAssignType alpha2;
+	ExpressionAssignType unkn11;
+	ExpressionAssignType unkn12;
+	ExpressionAssignType unkn13;
+	ExpressionAssignType unkn14;
+	ExpressionAssignType unkn15;
+	ExpressionAssignType unkn16;
+	ExpressionAssignType unkn17;
+	ExpressionAssignType unkn18;
+	ExpressionAssignType unkn19;
+	ExpressionAssignType unkn20;
+	ExpressionAssignType unkn21;
+	ExpressionAssignType unkn22;
+	ExpressionAssignType unkn23;
+	ExpressionAssignType unkn24;
+	ExpressionAssignType unkn25;
+	ExpressionAssignType unkn26;
+	ExpressionAssignType unkn27;
+	EFXExpressionList expressions;
+}RgbWaterExpression_MHWilds<read="[RgbWaterExpression]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	float unkn1;
+	float unkn2;
+	float unkn3;
+	float unkn4;
+	float unkn5;
+	float unkn6;
+	float unkn7;
+	float unkn8;
+	int len_flowmapMaskPath;
+	wstring flowmapMaskPath;
+}FlowMap_MHWilds<read="[FlowMap]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	ushort unkn1;
+	uint unkn2;
+	uint unkn3;
+	int len_efcsvPath;
+	wstring efcsvPath;
+	int len_unknString0;
+	wstring unknString0;
+	int len_unknString1;
+	wstring unknString1;
+	int len_unknString2;
+	wstring unknString2;
+}AssignCSV_RE4<read="[AssignCSV]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	UndeterminedFieldType unkn2;
+	UndeterminedFieldType unkn3;
+	uint unkn4;
+	UndeterminedFieldType unkn5;
+	UndeterminedFieldType unkn6;
+	UndeterminedFieldType unkn7;
+	int len_efcsvPath;
+	wstring efcsvPath;
+	int len_unknPath2;
+	wstring unknPath2;
+	int len_unknPath3;
+	wstring unknPath3;
+	int len_unknPath4;
+	wstring unknPath4;
+}DestinationCSV_DD2<read="[DestinationCSV]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn0;
+	byte unkn1;
+	float unkn2;
+	UndeterminedFieldType unkn3;
+	float unkn4;
+	float unkn5;
+	float unkn6;
+	float unkn7;
+	short unkn8;
+	float unkn9;
+	UndeterminedFieldType unkn10;
+	float unkn11;
+	UndeterminedFieldType unkn12;
+	float unkn13;
+}TerrainSnap_DD2<read="[TerrainSnap]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	UndeterminedFieldType unkn2;
+	float unkn3;
+}Trigger_DD2<read="[Trigger]">;
+
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1820,10 +2122,9 @@ typedef struct PtBehaviorVariableDataBase
 		short re4_unkn1;
 	}
 
-};
+}PtBehaviorVariableDataBase<read="[PtBehaviorVariableDataBase]">;
 
-typedef struct PtBehaviorVariableDataColor
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1833,10 +2134,9 @@ typedef struct PtBehaviorVariableDataColor
 
 	Color color;
 	if (size - 4 > 0) ubyte restData[size - 4] <optimize=false>;
-};
+}PtBehaviorVariableDataColor<read="[PtBehaviorVariableDataColor]">;
 
-typedef struct PtBehaviorVariableInteger
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1846,10 +2146,9 @@ typedef struct PtBehaviorVariableInteger
 
 	int value;
 	if (size - 4 > 0) ubyte restData[size - 4] <optimize=false>;
-};
+}PtBehaviorVariableInteger<read="[PtBehaviorVariableInteger]">;
 
-typedef struct PtBehaviorVariableFloat
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1859,10 +2158,9 @@ typedef struct PtBehaviorVariableFloat
 
 	float value;
 	if (size - 4 > 0) ubyte restData[size - 4] <optimize=false>;
-};
+}PtBehaviorVariableFloat<read="[PtBehaviorVariableFloat]">;
 
-typedef struct PtBehaviorVariableFloat2
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1872,10 +2170,9 @@ typedef struct PtBehaviorVariableFloat2
 
 	Vec2 Vec;
 	if (size - 8 > 0) ubyte restData[size - 8] <optimize=false>;
-};
+}PtBehaviorVariableFloat2<read="[PtBehaviorVariableFloat2]">;
 
-typedef struct PtBehaviorVariableFloat3
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1885,10 +2182,9 @@ typedef struct PtBehaviorVariableFloat3
 
 	Vec3 vec;
 	if (size - 12 > 0) ubyte restData[size - 12] <optimize=false>;
-};
+}PtBehaviorVariableFloat3<read="[PtBehaviorVariableFloat3]">;
 
-typedef struct PtBehaviorVariableDataPrefabPath
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1897,10 +2193,9 @@ typedef struct PtBehaviorVariableDataPrefabPath
 	}
 
 	wstring prefabPath;
-};
+}PtBehaviorVariableDataPrefabPath<read="[PtBehaviorVariableDataPrefabPath]">;
 
-typedef struct PtBehaviorVariableDataPrefabUnknown
-{
+typedef struct {
 	int unkn;
 	int size;
 	if (Version >= EfxVersion_RE4) { // end at: re4_unkn1
@@ -1909,10 +2204,9 @@ typedef struct PtBehaviorVariableDataPrefabUnknown
 	}
 
 	if (size > 0) ubyte data[size] <optimize=false>;
-};
+}PtBehaviorVariableDataPrefabUnknown<read="[PtBehaviorVariableDataPrefabUnknown]">;
 
-typedef struct PtBehaviorVariable
-{
+typedef struct {
 	int varSize;
 	PtBehaviorPropType dataType;
 	if (dataType == PtBehaviorPropType_PropColor) {
@@ -1932,24 +2226,35 @@ typedef struct PtBehaviorVariable
 	} else {
 		PtBehaviorVariableDataPrefabUnknown variable;
 	}
-	string behaviorProperty;
-};
+	if (Version >= EfxVersion_MHWilds) { // end at: varHash
+		uint varHash;
+	}
 
-typedef struct PtBehavior_RE4
-{    local int currentAttributeIndex = -1;
+	string behaviorProperty;
+}PtBehaviorVariable<read="[PtBehaviorVariable]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
 	int behaviorStringLength;
-	int varCount;
-	string behaviorString;
-	if (varCount > 0) PtBehaviorVariable properties[varCount] <optimize=false>;
-};
+	if (Version < EfxVersion_MHWilds) { // end at: varCount
+		int varCount;
+	}
 
-typedef struct PtColliderAction_DMC5
-{    local int currentAttributeIndex = -1;
+	string behaviorString;
+	if (Version >= EfxVersion_MHWilds) { // end at: varCount_mhws
+		int varCount_mhws;
+	}
+
+	if (Version < EfxVersion_MHWilds ? varCount : varCount_mhws > 0) PtBehaviorVariable properties[Version < EfxVersion_MHWilds ? varCount : varCount_mhws] <optimize=false>;
+}PtBehavior_RE4<read="[PtBehavior]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint dataFlags;
@@ -1986,11 +2291,11 @@ typedef struct PtColliderAction_DMC5
 		wstring unknString_flag1;
 	}
 
-};
+}PtColliderAction_DMC5<read="[PtColliderAction]">;
 
-typedef struct PtCollision_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	ubyte stringBitFlag;
@@ -2010,12 +2315,14 @@ typedef struct PtCollision_RE7
 		float unkn10;
 		float unkn11;
 		float unkn12;
-		float unkn13;
-		if (Version > EfxVersion_RE3) { // end at: unkn16
-			float unkn14;
-			if (Version > EfxVersion_RERT) { // end at: unkn16
-				uint unkn15;
-				float unkn16;
+		if (Version < EfxVersion_MHWilds) { // end at: unkn16
+			float unkn13;
+			if (Version > EfxVersion_RE3) { // end at: unkn16
+				float unkn14;
+				if (Version > EfxVersion_RERT) { // end at: unkn16
+					uint unkn15;
+					float unkn16;
+				}
 			}
 		}
 	}
@@ -2030,49 +2337,63 @@ typedef struct PtCollision_RE7
 		wstring unknString1;
 	}
 
-};
+}PtCollision_RE7<read="[PtCollision]">;
 
-typedef struct PtColor_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	float unkn2;
+	float unkn3;
+	UndeterminedFieldType unkn4;
+	UndeterminedFieldType unkn5;
+	UndeterminedFieldType unkn6;
+	UndeterminedFieldType unkn7;
+}PtProjection_MHWilds<read="[PtProjection]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
 	uint unkn2;
 	Color color0;
-};
+}PtColor_RE7<read="[PtColor]">;
 
-typedef struct PtColorClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(4);
 	uint unkn1;
 	EfxColorClipData clipData;
-};
+}PtColorClip_DMC5<read="[PtColorClip]">;
 
-typedef struct PtLife_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
 	uint unkn1_1;
 	int actionIndex;
-};
+}PtLife_RE7<read="[PtLife]">;
 
-typedef struct PtSort_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn;
-};
+}PtSort_RE8<read="[PtSort]">;
 
-typedef struct PtUvSequence_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -2082,334 +2403,21 @@ typedef struct PtUvSequence_DMC5
 	}
 
 	float unkn1_3;
-};
+}PtUvSequence_DMC5<read="[PtUvSequence]">;
 
-typedef struct PtUvSequenceClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(3);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}PtUvSequenceClip_DMC5<read="[PtUvSequenceClip]">;
 
-typedef struct UnknownDD2_117Expression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	BitSet expressionBits(24);
-	ExpressionAssignType unkn1;
-	ExpressionAssignType unkn2;
-	ExpressionAssignType unkn3;
-	ExpressionAssignType unkn4;
-	ExpressionAssignType unkn5;
-	ExpressionAssignType unkn6;
-	ExpressionAssignType unkn7;
-	ExpressionAssignType unkn8;
-	ExpressionAssignType unkn9;
-	ExpressionAssignType unkn10;
-	ExpressionAssignType unkn12;
-	ExpressionAssignType posX;
-	ExpressionAssignType posY;
-	ExpressionAssignType posZ;
-	ExpressionAssignType terminalPosX;
-	ExpressionAssignType terminalPosY;
-	ExpressionAssignType terminalPosZ;
-	ExpressionAssignType unkn19;
-	ExpressionAssignType unkn20;
-	ExpressionAssignType unkn21;
-	ExpressionAssignType unkn22;
-	ExpressionAssignType unkn23;
-	ExpressionAssignType unkn24;
-	EFXExpressionList expressions;
-};
-
-typedef struct UnknownDD2_146_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint null1;
-	float unkn2;
-	float unkn3;
-	float unkn4;
-	float null5;
-	float unkn6;
-	float unkn7;
-	float unkn8;
-	float unkn9;
-	float unkn10;
-	float unkn11;
-	float unkn12;
-	float null13;
-	float null14;
-	float null15;
-	uint unkn16;
-};
-
-typedef struct UnknownDD2_214_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	UndeterminedFieldType unkn1;
-	UndeterminedFieldType unkn2;
-	UndeterminedFieldType unkn3;
-};
-
-typedef struct UnknownDD2_218_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn1;
-	UndeterminedFieldType unkn2;
-};
-
-typedef struct UnknownDD2_219_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn0;
-	uint unkn1;
-	float unkn2;
-	float unkn3;
-	float unkn4;
-	float unkn5;
-	float unkn6;
-	float unkn7;
-	float unkn8;
-	float unkn9;
-	float unkn10;
-	float unkn12;
-	float unkn13;
-	float unkn14;
-	float unkn15;
-	float unkn16;
-	float unkn17;
-	float unkn18;
-	float unkn19;
-	float unkn20;
-};
-
-typedef struct UnknownDD2_220_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	UndeterminedFieldType unkn0;
-	UndeterminedFieldType unkn1;
-	float unkn2;
-	UndeterminedFieldType unkn3;
-	UndeterminedFieldType unkn4;
-	UndeterminedFieldType unkn5;
-	float unkn6;
-	float unkn7;
-};
-
-typedef struct UnknownDD2_221Expression_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	BitSet expressionBits(7);
-	ExpressionAssignType unkn1;
-	ExpressionAssignType unkn2;
-	ExpressionAssignType unkn3;
-	ExpressionAssignType unkn4;
-	ExpressionAssignType unkn5;
-	ExpressionAssignType unkn6;
-	ExpressionAssignType unkn7;
-	EFXExpressionList expressions;
-};
-
-typedef struct UnknownDD2_223_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint null1;
-	float unkn2;
-	float null3;
-	float null4;
-	float null5;
-	float unkn6;
-	float null7;
-	float null8;
-	float unkn9;
-	float unkn10;
-	float unkn11;
-	float unkn12;
-	float null13;
-	float null14;
-	float unkn15;
-};
-
-typedef struct UnknownDD2_224_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint null1;
-	float unkn2;
-	float unkn3;
-	float unkn4;
-	float null5;
-	float unkn6;
-};
-
-typedef struct UnknownDD2_225_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn1;
-	uint unkn2;
-	uint unkn3;
-	uint unkn4;
-	uint unkn5;
-	uint unkn6;
-	uint unkn7;
-	EFXExpressionList expressions;
-};
-
-typedef struct UnknownDD2_226_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn1;
-	uint unkn2;
-	float unkn3;
-	uint dataSize;
-	float unkn4;
-	float unkn5;
-	float unkn6;
-	float unkn7;
-	float unkn8;
-	float unkn9;
-	float unkn10;
-	float unkn11;
-	float unkn12;
-	float unkn13;
-	float unkn14;
-	float unkn15;
-	float unkn16;
-	float unkn17;
-	float unkn18;
-	if (dataSize * 7 > 0) float data[dataSize * 7] <optimize=false>;
-};
-
-typedef struct UnknownDD2_231Clip_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	BitSet clipBits(7);
-	UndeterminedFieldType unkn1;
-	EfxClipData clipData;
-};
-
-typedef struct UnknownDD2_232Expression_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	BitSet expressionBits(18);
-	ExpressionAssignType unkn1;
-	ExpressionAssignType unkn2;
-	ExpressionAssignType unkn3;
-	ExpressionAssignType unkn4;
-	ExpressionAssignType unkn5;
-	ExpressionAssignType unkn6;
-	ExpressionAssignType unkn7;
-	ExpressionAssignType unkn8;
-	ExpressionAssignType unkn9;
-	ExpressionAssignType unkn10;
-	ExpressionAssignType unkn11;
-	ExpressionAssignType unkn12;
-	ExpressionAssignType unkn13;
-	ExpressionAssignType unkn14;
-	ExpressionAssignType unkn15;
-	ExpressionAssignType unkn16;
-	ExpressionAssignType unkn17;
-	ExpressionAssignType unkn18;
-	EFXExpressionList expressions;
-};
-
-typedef struct UnknownDD2_239RgbColor_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn1;
-	Color color1;
-	Color color2;
-	float unkn3;
-	float unkn4;
-	float unkn5;
-	Color color3;
-	Color color4;
-	float unkn8;
-	float unkn9;
-	float unkn10;
-	ubyte ukn2_0;
-	uint ukn2_1;
-	uint ukn2_2;
-	uint ukn2_3;
-	uint ukn2_4;
-	uint ukn2_5;
-	uint ukn2_6;
-	ubyte ukn3_0;
-	uint ukn3_1;
-	ubyte ukn4_0;
-	uint ukn4_1;
-	uint ukn4_2;
-	uint ukn4_3;
-	uint ukn4_4;
-	uint ukn4_5;
-	uint ukn4_6;
-	ubyte ukn5_0;
-	uint ukn5_1;
-};
-
-typedef struct UnknownDD2_239RgbColorExpression_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	BitSet expressionBits(13);
-	ExpressionAssignType particleColor;
-	ExpressionAssignType unkn2;
-	ExpressionAssignType colorIntensityGreen;
-	ExpressionAssignType colorSaturate;
-	ExpressionAssignType unkn5;
-	ExpressionAssignType particleColor2;
-	ExpressionAssignType unkn7;
-	ExpressionAssignType colorIntensityRed;
-	ExpressionAssignType alpha1;
-	ExpressionAssignType alpha2;
-	ExpressionAssignType unkn11;
-	ExpressionAssignType unkn12;
-	ExpressionAssignType unkn13;
-	ExpressionAssignType unkn14;
-	ExpressionAssignType unkn15;
-	ExpressionAssignType unkn16;
-	ExpressionAssignType unkn17;
-	ExpressionAssignType unkn18;
-	ExpressionAssignType unkn19;
-	ExpressionAssignType unkn20;
-	ExpressionAssignType unkn21;
-	ExpressionAssignType unkn22;
-	EFXExpressionList expressions;
-};
-
-typedef struct UnknownDD2_243_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	UndeterminedFieldType unkn0;
@@ -2422,72 +2430,14 @@ typedef struct UnknownDD2_243_DD2
 	UndeterminedFieldType unkn7;
 	uint unkn8;
 	UndeterminedFieldType unkn9;
-};
+}PtFreezer_DD2<read="[PtFreezer]">;
 
-typedef struct UnknownDD2_245Efcsv_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-	uint unkn0;
-	UndeterminedFieldType unkn1;
-	UndeterminedFieldType unkn2;
-	uint unkn3;
-	UndeterminedFieldType unkn4;
-	UndeterminedFieldType unkn5;
-	UndeterminedFieldType unkn6;
-	int len_efcsvPath;
-	wstring efcsvPath;
-	int len_unknPath2;
-	wstring unknPath2;
-	int len_unknPath3;
-	wstring unknPath3;
-	int len_unknPath4;
-	wstring unknPath4;
-};
-
-typedef struct UnknownDD2_247_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn0;
-	byte unkn1;
-	float unkn2;
-	UndeterminedFieldType unkn3;
-	float unkn4;
-	float unkn5;
-	float unkn6;
-	float unkn7;
-	short unkn8;
-	float unkn9;
-	UndeterminedFieldType unkn10;
-	float unkn11;
-	UndeterminedFieldType unkn12;
-	float unkn13;
-};
-
-typedef struct UnknownDD2_249_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn_bitmask;
-};
-
-typedef struct UnknownDD2_250_DD2
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-};
-
-typedef struct unknSBStruct195_MHRiseSB
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	typedef struct EFXAttributeunknSBStruct195_Substruct_t {
+	typedef struct PtPathTranslateSubstruct_t {
 		float unkn0;
 		float unkn1;
 		float unkn2;
@@ -2495,292 +2445,38 @@ typedef struct unknSBStruct195_MHRiseSB
 		float unkn4;
 		float unkn5;
 		float unkn6;
-		float unkn7;
-		float unkn11;
-		float unkn12;
-		float unkn13;
-	} EFXAttributeunknSBStruct195_Substruct ;
-	uint unkn1;
-	if (Version >= EfxVersion_RE4) { // end at: re4_unkn0
-		uint re4_unkn0;
-	}
-
-	float unkn2_0;
-	int substructCount;
-	if (substructCount > 0) EFXAttributeunknSBStruct195_Substruct substruct[substructCount] <optimize=false>;
-	float unkn13;
-	float unkn14;
-	float unkn15;
-};
-
-typedef struct UnknownRE4_114_RE4
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn0_0;
-	uint unkn0_1;
-	uint unkn0_2;
-	uint unkn0_3;
-	float unkn1_0;
-	float unkn1_1;
-	float unkn1_2;
-	int unkn2;
-	float unkn3_0;
-	float unkn3_1;
-	float unkn3_2;
-	float unkn3_3;
-	float unkn3_4;
-	uint unkn3_5;
-	uint unkn4_0;
-	float unkn4_1;
-	float unkn4_2;
-	Color color0;
-	Color color1;
-	Color color2;
-	float unkn5_0;
-	float unkn5_1;
-	float unkn5_2;
-	float unkn5_3;
-	float unkn5_4;
-	float unkn5_5;
-	float unkn5_6;
-	float unkn5_7;
-	uint unkn5_8;
-	float unkn5_9;
-	float unkn5_10;
-	float unkn5_11;
-	float unkn5_12;
-	float unkn5_13;
-	float unkn5_14;
-	float unkn5_15;
-	float unkn5_16;
-	float unkn5_17;
-	float unkn5_18;
-	float unkn5_19;
-	float unkn5_20;
-	float unkn5_21;
-	float unkn5_22;
-	float unkn5_23;
-	uint unkn5_24;
-	float unkn5_25;
-	float unkn5_26;
-	uint unkn5_27;
-	float unkn5_28;
-	float unkn5_29;
-	float unkn5_30;
-	float unkn5_31;
-	int unkn6;
-	float unkn7_0;
-	float unkn7_1;
-	float unkn7_2;
-	float unkn7_3;
-	float unkn7_4;
-	float unkn7_5;
-	int len_boneName;
-	wstring boneName;
-	int unkn8_0;
-	uint unkn8_color1;
-	uint unkn8_color2;
-	float unkn8_3;
-	float unkn8_4;
-	int unkn8_5;
-	float unkn8_6;
-};
-
-typedef struct UnknownRE4_195_RE4
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	float unkn0;
-	float unkn1;
-	float unkn2;
-	float unkn3;
-	uint unkn4;
-	uint unkn5;
-	if (Version != EfxVersion_DD2) { // end at: unkn6
-		ushort unkn6;
-	}
-
-};
-
-typedef struct UnknownRE4_197_RE4
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn0;
+	} PtPathTranslateSubstruct ;
 	uint unkn1;
 	uint unkn2;
-	uint unkn3;
+	float unkn3;
+	int dataSize;
 	float unkn4;
 	float unkn5;
 	float unkn6;
 	float unkn7;
-	ubyte unkn8;
-	ubyte unkn9;
-	ubyte unkn10;
-	float unkn11;
-	float unkn12;
-	float unkn13;
-	float unkn14;
-	float unkn15;
-	float unkn16;
-	float unkn17;
-	float unkn18;
-	float unkn19;
-	ubyte unkn20;
-};
-
-typedef struct UnknownRE4_213_RE4
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	typedef struct UnknownRE4_213_Substruct1_t {
-		float unkn0;
-		float unkn1;
-		float unkn2;
-		float unkn3;
-		float unkn4;
-	} UnknownRE4_213_Substruct1 ;
-	typedef struct UnknownRE4_213_Substruct2_t {
-		float unkn0;
-		float unkn1;
-		float unkn2;
-		float unkn3;
-		float unkn4;
-		float unkn5;
-		float unkn6;
-	} UnknownRE4_213_Substruct2 ;
-	UndeterminedFieldType unkn1;
-	int substruct1Count;
-	float unkn2;
-	int substruct2Count;
-	if (substruct1Count > 0) UnknownRE4_213_Substruct1 substruct1[substruct1Count] <optimize=false>;
-	if (substruct2Count > 0) UnknownRE4_213_Substruct2 substruct2[substruct2Count] <optimize=false>;
-};
-
-typedef struct UnknownRE4_226_RE4
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint unkn0;
-	Color color0;
-	Color color1;
-	float unkn3;
-	float unkn4;
-	float unkn5;
-	Color color2;
-	Color color3;
 	float unkn8;
 	float unkn9;
 	float unkn10;
 	float unkn11;
 	float unkn12;
-	float unkn13;
-	float unkn14;
-	float unkn15;
-	float unkn16;
-	uint unkn17;
-	float unkn18;
-	float unkn19;
-	float unkn20;
-	float unkn21;
-	float unkn22;
-	float unkn23;
-	uint unkn24;
-	float unkn25;
-};
+	Vec3 rotation;
+	Vec3 scale;
+	if (dataSize > 0) PtPathTranslateSubstruct substruct2[dataSize] <optimize=false>;
+}PtPathTranslate_RE4<read="[PtPathTranslate]">;
 
-typedef struct UnknownRE4_228_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	byte unkn0_1;
-	byte unkn0_2;
-	byte unkn0_3;
-	byte unkn0_4;
-	float unkn1;
-	byte unkn2_1;
-	byte unkn2_2;
-	byte unkn2_3;
-	byte unkn2_4;
-	float unkn3;
-	float unkn4;
-	float unkn5;
-	ubyte toggle_b1;
-	uint unkn6;
-	UndeterminedFieldType unkn7;
-	uint unkn8;
-	UndeterminedFieldType unkn9;
-	ubyte toggle_b2;
-	UndeterminedFieldType unkn10;
-	UndeterminedFieldType unkn11;
-	UndeterminedFieldType unkn12;
-	UndeterminedFieldType unkn13;
-	UndeterminedFieldType unkn14;
-	uint unkn15;
-	UndeterminedFieldType unkn16;
-	uint unkn17;
-	UndeterminedFieldType unkn18;
-	UndeterminedFieldType unkn19;
-	ubyte toggle_b3;
-	UndeterminedFieldType unkn20;
-	UndeterminedFieldType unkn21;
-	uint unkn22;
-	UndeterminedFieldType unkn23;
-	uint unkn24;
-	UndeterminedFieldType unkn25;
-	UndeterminedFieldType unkn26;
-};
-
-typedef struct UnknownRE4_231_RE4
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	ushort unkn0;
-	uint unkn1;
-	uint unkn2;
-	int len_efcsvPath;
-	wstring efcsvPath;
-	int len_unknString0;
-	wstring unknString0;
-	int len_unknString1;
-	wstring unknString1;
-	int len_unknString2;
-	wstring unknString2;
-};
-
-typedef struct UnknownRERT_233_RERT
-{    local int currentAttributeIndex = -1;
-    uint itemType;
-    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
-
-	uint ukn0;
-	uint hash1;
-	uint hash2;
-	UndeterminedFieldType ukn3;
-	int ukn4;
-};
-
-typedef struct Transform2D_DMC5
-{    local int currentAttributeIndex = -1;
-    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	Vec2 position;
 	float rotation;
 	Vec2 scale;
-};
+}Transform2D_DMC5<read="[Transform2D]">;
 
-typedef struct Transform2DClip_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn0;
@@ -2833,11 +2529,11 @@ typedef struct Transform2DClip_RERT
 	ubyte ukn8_0;
 	ubyte ukn8_1;
 	uint ukn9;
-};
+}Transform2DClip_RERT<read="[Transform2DClip]">;
 
-typedef struct Transform2DExpression_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(5);
@@ -2847,31 +2543,31 @@ typedef struct Transform2DExpression_RE2
 	ExpressionAssignType scaleX;
 	ExpressionAssignType scaleY;
 	EFXExpressionList expressions;
-};
+}Transform2DExpression_RE2<read="[Transform2DExpression]">;
 
-typedef struct Transform2DModifierDelayFrame_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn1;
-};
+}Transform2DModifierDelayFrame_RE4<read="[Transform2DModifierDelayFrame]">;
 
-typedef struct Transform3D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	Vec3 translation;
 	Vec3 rotation;
 	Vec3 scale;
 	int rotationOrder;
-};
+}Transform3D_DMC5<read="[Transform3D]">;
 
-typedef struct Transform3DExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(9);
@@ -2885,30 +2581,30 @@ typedef struct Transform3DExpression_DMC5
 	ExpressionAssignType scaleY;
 	ExpressionAssignType scaleZ;
 	EFXExpressionList expressions;
-};
+}Transform3DExpression_DMC5<read="[Transform3DExpression]">;
 
-typedef struct Transform3DClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(9);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}Transform3DClip_DMC5<read="[Transform3DClip]">;
 
-typedef struct Transform3DModifierDelayFrame_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn1;
-};
+}Transform3DModifierDelayFrame_RE4<read="[Transform3DModifierDelayFrame]">;
 
-typedef struct Transform3DModifier_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -2966,11 +2662,11 @@ typedef struct Transform3DModifier_RE2
 	float unkn52;
 	float unkn53;
 	UndeterminedFieldType unkn54;
-};
+}Transform3DModifier_RE2<read="[Transform3DModifier]">;
 
-typedef struct PtTransform2D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn0;
@@ -2978,41 +2674,41 @@ typedef struct PtTransform2D_DMC5
 	UndeterminedFieldType unkn2;
 	float unkn3;
 	float unkn4;
-};
+}PtTransform2D_DMC5<read="[PtTransform2D]">;
 
-typedef struct PtTransform2DClip_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(5);
 	UndeterminedFieldType unkn1;
 	EfxClipData clipData;
-};
+}PtTransform2DClip_RE8<read="[PtTransform2DClip]">;
 
-typedef struct PtTransform3D_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	Vec3 position;
 	Vec3 rotation;
 	Vec3 scale;
-};
+}PtTransform3D_RE7<read="[PtTransform3D]">;
 
-typedef struct PtTransform3DClip_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(9);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}PtTransform3DClip_RE7<read="[PtTransform3DClip]">;
 
-typedef struct PtTransform3DExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(9);
@@ -3026,11 +2722,11 @@ typedef struct PtTransform3DExpression_DD2
 	ExpressionAssignType scaleY;
 	ExpressionAssignType scaleZ;
 	EFXExpressionList expressions;
-};
+}PtTransform3DExpression_DD2<read="[PtTransform3DExpression]">;
 
-typedef struct RotateAnim_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -3051,20 +2747,20 @@ typedef struct RotateAnim_DMC5
 		uint unkn4_9;
 	}
 
-};
+}RotateAnim_DMC5<read="[RotateAnim]">;
 
-typedef struct RotateAnimDelayFrame_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn2;
-};
+}RotateAnimDelayFrame_RE4<read="[RotateAnimDelayFrame]">;
 
-typedef struct RotateAnimExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(12);
@@ -3081,11 +2777,11 @@ typedef struct RotateAnimExpression_RE7
 	ExpressionAssignType ukn1_11;
 	ExpressionAssignType ukn1_12;
 	EFXExpressionList expressions;
-};
+}RotateAnimExpression_RE7<read="[RotateAnimExpression]">;
 
-typedef struct ScaleAnim_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float minScale;
@@ -3109,20 +2805,20 @@ typedef struct ScaleAnim_DMC5
 		uint unkn1_17;
 	}
 
-};
+}ScaleAnim_DMC5<read="[ScaleAnim]">;
 
-typedef struct ScaleAnimDelayFrame_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn2;
-};
+}ScaleAnimDelayFrame_RE4<read="[ScaleAnimDelayFrame]">;
 
-typedef struct ScaleAnimExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(8);
@@ -3138,11 +2834,11 @@ typedef struct ScaleAnimExpression_DMC5
 	}
 
 	EFXExpressionList expressions;
-};
+}ScaleAnimExpression_DMC5<read="[ScaleAnimExpression]">;
 
-typedef struct ScaleByDepth_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -3152,11 +2848,11 @@ typedef struct ScaleByDepth_RE4
 	float unkn2_3;
 	float unkn2_4;
 	float unkn2_5;
-};
+}ScaleByDepth_RE4<read="[ScaleByDepth]">;
 
-typedef struct TypeBillboard2D_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -3175,11 +2871,11 @@ typedef struct TypeBillboard2D_RE7
 	float unkn13;
 	float unkn14;
 	uint unkn15;
-};
+}TypeBillboard2D_RE7<read="[TypeBillboard2D]">;
 
-typedef struct TypeBillboard2DExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(13);
@@ -3202,11 +2898,11 @@ typedef struct TypeBillboard2DExpression_RE7
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeBillboard2DExpression_RE7<read="[TypeBillboard2DExpression]">;
 
-typedef struct TypeBillboard3D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -3234,11 +2930,11 @@ typedef struct TypeBillboard3D_DMC5
 		float unkn16;
 	}
 
-};
+}TypeBillboard3D_DMC5<read="[TypeBillboard3D]">;
 
-typedef struct TypeBillboard3DExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(13);
@@ -3265,11 +2961,11 @@ typedef struct TypeBillboard3DExpression_DMC5
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeBillboard3DExpression_DMC5<read="[TypeBillboard3DExpression]">;
 
-typedef struct TypeBillboard3DMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn0;
@@ -3290,21 +2986,21 @@ typedef struct TypeBillboard3DMaterial_DD2
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypeBillboard3DMaterial_DD2<read="[TypeBillboard3DMaterial]">;
 
-typedef struct TypeBillboard3DMaterialClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(5);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeBillboard3DMaterialClip_DD2<read="[TypeBillboard3DMaterialClip]">;
 
-typedef struct TypeBillboard3DMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(13);
@@ -3324,11 +3020,11 @@ typedef struct TypeBillboard3DMaterialExpression_DD2
 	ExpressionAssignType ukn13;
 	uint materialExpressionCount;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeBillboard3DMaterialExpression_DD2<read="[TypeBillboard3DMaterialExpression]">;
 
-typedef struct TypeNodeBillboard_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -3423,11 +3119,11 @@ typedef struct TypeNodeBillboard_RE7
 	}
 
 	float unkn1_61;
-};
+}TypeNodeBillboard_RE7<read="[TypeNodeBillboard]">;
 
-typedef struct TypeNodeBillboardExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(42);
@@ -3474,11 +3170,11 @@ typedef struct TypeNodeBillboardExpression_DMC5
 	ExpressionAssignType unkn41;
 	ExpressionAssignType unkn42;
 	EFXExpressionList expressions;
-};
+}TypeNodeBillboardExpression_DMC5<read="[TypeNodeBillboardExpression]">;
 
-typedef struct TypeGpuBillboard_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version < EfxVersion_RE4) { // end at: instanceCount
@@ -3517,11 +3213,11 @@ typedef struct TypeGpuBillboard_RE2
 		float sb_unkn5;
 	}
 
-};
+}TypeGpuBillboard_RE2<read="[TypeGpuBillboard]">;
 
-typedef struct TypeGpuBillboardExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(14);
@@ -3546,21 +3242,21 @@ typedef struct TypeGpuBillboardExpression_DMC5
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeGpuBillboardExpression_DMC5<read="[TypeGpuBillboardExpression]">;
 
-typedef struct TypeGpuBillboardClip_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(7);
 	UndeterminedFieldType unkn1;
 	EfxClipData clipData;
-};
+}TypeGpuBillboardClip_RE4<read="[TypeGpuBillboardClip]">;
 
-typedef struct TypeNoDraw_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -3579,11 +3275,16 @@ typedef struct TypeNoDraw_RE7
 	float unkn11;
 	float unkn12;
 	float unkn13;
-};
+	if (Version >= EfxVersion_MHWilds) { // end at: unkn15
+		float unkn14;
+		UndeterminedFieldType unkn15;
+	}
 
-typedef struct TypeNoDrawExpression_RE3
-{    local int currentAttributeIndex = -1;
+}TypeNoDraw_RE7<read="[TypeNoDraw]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(16);
@@ -3609,19 +3310,20 @@ typedef struct TypeNoDrawExpression_RE3
 	ExpressionAssignType unkn14;
 	ExpressionAssignType unkn15;
 	ExpressionAssignType unkn16;
-	EFXExpressionList expressions;
-};
+	if (Version >= EfxVersion_MHWilds) { // end at: unkn18
+		ExpressionAssignType unkn17;
+		ExpressionAssignType unkn18;
+	}
 
-typedef struct UnitCulling_DMC5
-{    local int currentAttributeIndex = -1;
+	EFXExpressionList expressions;
+}TypeNoDrawExpression_RE3<read="[TypeNoDrawExpression]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint cullingFlags;
-	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn
-		uint mhws_unkn;
-	}
-
 	float unkn1;
 	float unkn2;
 	float unkn3;
@@ -3635,11 +3337,11 @@ typedef struct UnitCulling_DMC5
 		float cullingDistance;
 	}
 
-};
+}UnitCulling_DMC5<read="[UnitCulling]">;
 
-typedef struct UnitCullingExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(11);
@@ -3655,11 +3357,11 @@ typedef struct UnitCullingExpression_DD2
 	ExpressionAssignType unkn10;
 	ExpressionAssignType cullingDistance;
 	EFXExpressionList expressions;
-};
+}UnitCullingExpression_DD2<read="[UnitCullingExpression]">;
 
-typedef struct TypeLightning3DV1_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unknBitFlag;
@@ -3755,11 +3457,11 @@ typedef struct TypeLightning3DV1_RE7
 
 	int len_boneName;
 	wstring boneName;
-};
+}TypeLightning3DV1_RE7<read="[TypeLightning3DV1]">;
 
-typedef struct TypeLightning3D_MHRiseSB
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unknBitFlag;
@@ -3851,11 +3553,11 @@ typedef struct TypeLightning3D_MHRiseSB
 
 	int len_boneName;
 	wstring boneName;
-};
+}TypeLightning3D_MHRiseSB<read="[TypeLightning3D]">;
 
-typedef struct TypeLightning3DExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(48);
@@ -3911,11 +3613,11 @@ typedef struct TypeLightning3DExpression_DD2
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeLightning3DExpression_DD2<read="[TypeLightning3DExpression]">;
 
-typedef struct TypeLightning3DMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unknBitFlag;
@@ -4000,11 +3702,11 @@ typedef struct TypeLightning3DMaterial_DD2
 	}
 	int len_uknString;
 	wstring uknString;
-};
+}TypeLightning3DMaterial_DD2<read="[TypeLightning3DMaterial]">;
 
-typedef struct TypeLightning3DMaterialClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn1;
@@ -4023,11 +3725,11 @@ typedef struct TypeLightning3DMaterialClip_DD2
 	if (subSize1 / 4 > 0) int sub2[subSize1 / 4] <optimize=false>;
 	if (subSize2 * 4 > 0) int sub3[subSize2 * 4] <optimize=false>;
 	if (subSize2 > 0) int sub4[subSize2] <optimize=false>;
-};
+}TypeLightning3DMaterialClip_DD2<read="[TypeLightning3DMaterialClip]">;
 
-typedef struct TypeLightning3DMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(44);
@@ -4077,11 +3779,11 @@ typedef struct TypeLightning3DMaterialExpression_DD2
 	ExpressionAssignType unkn44;
 	uint materialExpressionCount;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeLightning3DMaterialExpression_DD2<read="[TypeLightning3DMaterialExpression]">;
 
-typedef struct TypeGpuLightning3D_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -4174,11 +3876,33 @@ typedef struct TypeGpuLightning3D_DD2
 	wstring str1;
 	wstring str2;
 	wstring str3;
-};
+}TypeGpuLightning3D_DD2<read="[TypeGpuLightning3D]">;
 
-typedef struct TypeMesh_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint data[46] <optimize=false>;
+}TypeLightningExpensive_MHWilds<read="[TypeLightningExpensive]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn0;
+	float unkn1;
+	UndeterminedFieldType unkn2;
+	uint unkn3;
+	UndeterminedFieldType unkn4;
+	float unkn5;
+	UndeterminedFieldType unkn6;
+}PtLightningBranchAction_MHWilds<read="[PtLightningBranchAction]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn1;
@@ -4227,11 +3951,11 @@ typedef struct TypeMesh_RE7
 		if (texCount > 0) struct { wstring str; } texPaths[texCount] <read=str,optimize=false>;
 	}
 
-};
+}TypeMesh_RE7<read="[TypeMesh]">;
 
-typedef struct TypeMeshV2_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn1;
@@ -4274,6 +3998,10 @@ typedef struct TypeMeshV2_RE8
 		uint re4_unkn1;
 	}
 
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn1
+		uint mhws_unkn1;
+	}
+
 	if (Version >= EfxVersion_DD2) { // end at: dd2_unkn1
 		float dd2_unkn1;
 	}
@@ -4293,11 +4021,11 @@ typedef struct TypeMeshV2_RE8
 	if (propertiesDataSize / 32 > 0) MdfProperty properties[propertiesDataSize / 32] <optimize=false>;
 	int texPathBlockLength;
 	if (texCount > 0) struct { wstring str; } texPaths[texCount] <read=str,optimize=false>;
-};
+}TypeMeshV2_RE8<read="[TypeMeshV2]">;
 
-typedef struct TypeMeshClip_RE3
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(13);
@@ -4314,11 +4042,11 @@ typedef struct TypeMeshClip_RE3
 	}
 
 	EfxMaterialClipData clipData;
-};
+}TypeMeshClip_RE3<read="[TypeMeshClip]">;
 
-typedef struct TypeMeshExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version >= EfxVersion_RE2 && Version < EfxVersion_RE4) { // end at: matExpressionSize
@@ -4379,17 +4107,25 @@ typedef struct TypeMeshExpression_RE7
 		if (indicesCount > 0) uint materialIndices[indicesCount] <optimize=false>;
 	}
 
-};
+}TypeMeshExpression_RE7<read="[TypeMeshExpression]">;
 
-typedef struct TypeGpuMesh_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	ubyte unkn0_1;
 	ubyte unkn0_2;
 	ubyte unkn0_3;
 	ubyte unkn0_4;
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn1
+		float mhws_unkn1;
+	}
+
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn2
+		float mhws_unkn2;
+	}
+
 	uint unkn1;
 	uint unkn2;
 	if (Version < EfxVersion_DD2) { // end at: unkn3
@@ -4456,21 +4192,21 @@ typedef struct TypeGpuMesh_RE8
 	if (unknDataSize > 0) ubyte unknData[unknDataSize] <optimize=false>;
 	int texBlockLength;
 	if (texCount > 0) struct { wstring str; } texturePaths[texCount] <read=str,optimize=false>;
-};
+}TypeGpuMesh_RE8<read="[TypeGpuMesh]">;
 
-typedef struct TypeGpuMeshClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(1);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeGpuMeshClip_DD2<read="[TypeGpuMeshClip]">;
 
-typedef struct TypeGpuMeshExpression_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(19);
@@ -4499,11 +4235,11 @@ typedef struct TypeGpuMeshExpression_RE8
 		EFXMaterialExpressionList materialExpressions;
 	}
 
-};
+}TypeGpuMeshExpression_RE8<read="[TypeGpuMeshExpression]">;
 
-typedef struct TypeGpuMeshTrail_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -4570,11 +4306,11 @@ typedef struct TypeGpuMeshTrail_RE8
 	wstring mdfPath;
 	uint dataSize;
 	uint texBlockLength;
-};
+}TypeGpuMeshTrail_RE8<read="[TypeGpuMeshTrail]">;
 
-typedef struct TypeGpuMeshTrailV2_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unknFlags;
@@ -4645,21 +4381,21 @@ typedef struct TypeGpuMeshTrailV2_DD2
 	if (propertiesDataSize / 32 > 0) MdfProperty properties[propertiesDataSize / 32] <optimize=false>;
 	uint texBlockLength;
 	if (texCount > 0) struct { wstring str; } texPaths[texCount] <read=str,optimize=false>;
-};
+}TypeGpuMeshTrailV2_DD2<read="[TypeGpuMeshTrailV2]">;
 
-typedef struct TypeGpuMeshTrailClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(23);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeGpuMeshTrailClip_DD2<read="[TypeGpuMeshTrailClip]">;
 
-typedef struct TypeGpuMeshTrailExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(21);
@@ -4686,11 +4422,11 @@ typedef struct TypeGpuMeshTrailExpression_DD2
 	EFXExpressionList expressions;
 	int materialExpressionCount;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeGpuMeshTrailExpression_DD2<read="[TypeGpuMeshTrailExpression]">;
 
-typedef struct TypePolygon_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint mFlags;
@@ -4731,21 +4467,21 @@ typedef struct TypePolygon_RE7
 		uint re4_unkn2;
 	}
 
-};
+}TypePolygon_RE7<read="[TypePolygon]">;
 
-typedef struct TypePolygonClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(9);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}TypePolygonClip_DMC5<read="[TypePolygonClip]">;
 
-typedef struct TypePolygonExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(19);
@@ -4772,11 +4508,11 @@ typedef struct TypePolygonExpression_RE7
 	}
 
 	EFXExpressionList expressions;
-};
+}TypePolygonExpression_RE7<read="[TypePolygonExpression]">;
 
-typedef struct TypePolygonMaterial_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -4802,11 +4538,11 @@ typedef struct TypePolygonMaterial_RE8
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypePolygonMaterial_RE8<read="[TypePolygonMaterial]">;
 
-typedef struct TypePolygonTrail_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -4837,11 +4573,11 @@ typedef struct TypePolygonTrail_RE2
 	Color color5;
 	float unkn19;
 	float unkn20;
-};
+}TypePolygonTrail_RE2<read="[TypePolygonTrail]">;
 
-typedef struct TypePolygonTrailMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -4865,11 +4601,11 @@ typedef struct TypePolygonTrailMaterial_DD2
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypePolygonTrailMaterial_DD2<read="[TypePolygonTrailMaterial]">;
 
-typedef struct TypePolygonTrailMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(7);
@@ -4883,11 +4619,11 @@ typedef struct TypePolygonTrailMaterialExpression_DD2
 	ExpressionAssignType unkn7;
 	int materialExpressionCount;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypePolygonTrailMaterialExpression_DD2<read="[TypePolygonTrailMaterialExpression]">;
 
-typedef struct TypeGpuPolygon_RE3
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -4933,11 +4669,11 @@ typedef struct TypeGpuPolygon_RE3
 		uint re_unkn3;
 	}
 
-};
+}TypeGpuPolygon_RE3<read="[TypeGpuPolygon]">;
 
-typedef struct TypeGpuPolygonExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(19);
@@ -4961,11 +4697,11 @@ typedef struct TypeGpuPolygonExpression_DD2
 	ExpressionAssignType unkn18;
 	ExpressionAssignType unkn19;
 	EFXExpressionList expressions;
-};
+}TypeGpuPolygonExpression_DD2<read="[TypeGpuPolygonExpression]">;
 
-typedef struct TypeRibbonLength_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -5026,11 +4762,11 @@ typedef struct TypeRibbonLength_RE7
 		}
 	}
 
-};
+}TypeRibbonLength_RE7<read="[TypeRibbonLength]">;
 
-typedef struct TypeRibbonLengthExpression_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(19);
@@ -5066,11 +4802,11 @@ typedef struct TypeRibbonLengthExpression_RE7
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeRibbonLengthExpression_RE7<read="[TypeRibbonLengthExpression]">;
 
-typedef struct TypeRibbonLengthMaterial_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	UndeterminedFieldType unkn1;
@@ -5129,11 +4865,11 @@ typedef struct TypeRibbonLengthMaterial_RE8
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypeRibbonLengthMaterial_RE8<read="[TypeRibbonLengthMaterial]">;
 
-typedef struct TypeRibbonLengthMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(15);
@@ -5155,11 +4891,11 @@ typedef struct TypeRibbonLengthMaterialExpression_DD2
 	ExpressionAssignType unkn15;
 	int materialExpressionCount;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeRibbonLengthMaterialExpression_DD2<read="[TypeRibbonLengthMaterialExpression]">;
 
-typedef struct TypeRibbonChainV1_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -5194,11 +4930,11 @@ typedef struct TypeRibbonChainV1_RE7
 	UndeterminedFieldType null2_22;
 	UndeterminedFieldType null2_23;
 	UndeterminedFieldType null2_24;
-};
+}TypeRibbonChainV1_RE7<read="[TypeRibbonChainV1]">;
 
-typedef struct TypeRibbonChain_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -5219,6 +4955,10 @@ typedef struct TypeRibbonChain_RE2
 	float unkn2_5;
 	float unkn2_6;
 	float unkn2_7;
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn1
+		uint mhws_unkn1;
+	}
+
 	float unkn2_8;
 	if (Version >= EfxVersion_RERT) { // end at: rert_unkn1
 		float rert_unkn1;
@@ -5228,11 +4968,11 @@ typedef struct TypeRibbonChain_RE2
 		float dd2_unkn0;
 	}
 
-	ubyte unkn2_9_1;
-	ubyte unkn2_9_2;
-	ubyte unkn2_9_3;
-	ubyte unkn2_9_4;
-	float unkn2_10;
+	ByteSet unkn2_9_1;
+	if (Version < EfxVersion_MHWilds) { // end at: unkn2_10
+		float unkn2_10;
+	}
+
 	float unkn2_11;
 	float unkn2_12;
 	float unkn2_13;
@@ -5301,11 +5041,15 @@ typedef struct TypeRibbonChain_RE2
 		float dd2_unkn7;
 	}
 
-};
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn2
+		float mhws_unkn2;
+	}
 
-typedef struct TypeRibbonChainExpression_RE2
-{    local int currentAttributeIndex = -1;
+}TypeRibbonChain_RE2<read="[TypeRibbonChain]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(17);
@@ -5333,11 +5077,11 @@ typedef struct TypeRibbonChainExpression_RE2
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeRibbonChainExpression_RE2<read="[TypeRibbonChainExpression]">;
 
-typedef struct TypeRibbonChainMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -5411,21 +5155,21 @@ typedef struct TypeRibbonChainMaterial_DD2
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypeRibbonChainMaterial_DD2<read="[TypeRibbonChainMaterial]">;
 
-typedef struct TypeRibbonChainMaterialClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(6);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeRibbonChainMaterialClip_DD2<read="[TypeRibbonChainMaterialClip]">;
 
-typedef struct TypeRibbonChainMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -5447,11 +5191,11 @@ typedef struct TypeRibbonChainMaterialExpression_DD2
 	uint unkn1_17;
 	uint unkn1_18;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeRibbonChainMaterialExpression_DD2<read="[TypeRibbonChainMaterialExpression]">;
 
-typedef struct TypeRibbonFixEnd_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -5500,11 +5244,11 @@ typedef struct TypeRibbonFixEnd_RE4
 		float unkn2_27;
 	}
 
-};
+}TypeRibbonFixEnd_RE4<read="[TypeRibbonFixEnd]">;
 
-typedef struct TypeRibbonFixEndExpression_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(17);
@@ -5532,11 +5276,11 @@ typedef struct TypeRibbonFixEndExpression_RE8
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeRibbonFixEndExpression_RE8<read="[TypeRibbonFixEndExpression]">;
 
-typedef struct TypeRibbonFixEndMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -5579,21 +5323,21 @@ typedef struct TypeRibbonFixEndMaterial_DD2
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypeRibbonFixEndMaterial_DD2<read="[TypeRibbonFixEndMaterial]">;
 
-typedef struct TypeRibbonFixEndMaterialClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(1);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeRibbonFixEndMaterialClip_DD2<read="[TypeRibbonFixEndMaterialClip]">;
 
-typedef struct TypeRibbonFixEndMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -5615,11 +5359,11 @@ typedef struct TypeRibbonFixEndMaterialExpression_DD2
 	uint unkn1_17;
 	uint unkn1_18;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeRibbonFixEndMaterialExpression_DD2<read="[TypeRibbonFixEndMaterialExpression]">;
 
-typedef struct TypeRibbonFollow_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint emission;
@@ -5695,11 +5439,11 @@ typedef struct TypeRibbonFollow_RE7
 		UndeterminedFieldType rert_unkn3;
 	}
 
-};
+}TypeRibbonFollow_RE7<read="[TypeRibbonFollow]">;
 
-typedef struct TypeRibbonFollowExpression_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(17);
@@ -5724,11 +5468,11 @@ typedef struct TypeRibbonFollowExpression_DMC5
 	}
 
 	EFXExpressionList expressions;
-};
+}TypeRibbonFollowExpression_DMC5<read="[TypeRibbonFollowExpression]">;
 
-typedef struct TypeRibbonFollowMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -5772,21 +5516,21 @@ typedef struct TypeRibbonFollowMaterial_DD2
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypeRibbonFollowMaterial_DD2<read="[TypeRibbonFollowMaterial]">;
 
-typedef struct TypeRibbonFollowMaterialClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(10);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeRibbonFollowMaterialClip_DD2<read="[TypeRibbonFollowMaterialClip]">;
 
-typedef struct TypeRibbonFollowMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(15);
@@ -5808,11 +5552,11 @@ typedef struct TypeRibbonFollowMaterialExpression_DD2
 	ExpressionAssignType unkn15;
 	uint materialExpressionCount;
 	EFXMaterialExpressionList materialExpressions;
-};
+}TypeRibbonFollowMaterialExpression_DD2<read="[TypeRibbonFollowMaterialExpression]">;
 
-typedef struct TypeRibbonLightweight_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1;
@@ -5840,11 +5584,11 @@ typedef struct TypeRibbonLightweight_DMC5
 		float unkn2_10;
 	}
 
-};
+}TypeRibbonLightweight_DMC5<read="[TypeRibbonLightweight]">;
 
-typedef struct TypeRibbonParticle_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn1;
@@ -5881,11 +5625,11 @@ typedef struct TypeRibbonParticle_DD2
 	float ukn31;
 	float ukn32;
 	float ukn33;
-};
+}TypeRibbonParticle_DD2<read="[TypeRibbonParticle]">;
 
-typedef struct TypeRibbonTrail_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -5907,11 +5651,11 @@ typedef struct TypeRibbonTrail_RE7
 
 	uint unkn11;
 	uint unkn12;
-};
+}TypeRibbonTrail_RE7<read="[TypeRibbonTrail]">;
 
-typedef struct TypeRibbonParticleExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(17);
@@ -5933,11 +5677,11 @@ typedef struct TypeRibbonParticleExpression_DD2
 	ExpressionAssignType unkn16;
 	ExpressionAssignType unkn17;
 	EFXExpressionList expressions;
-};
+}TypeRibbonParticleExpression_DD2<read="[TypeRibbonParticleExpression]">;
 
-typedef struct TypeGpuRibbonFollow_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -5973,11 +5717,11 @@ typedef struct TypeGpuRibbonFollow_RE2
 		float unkn14;
 	}
 
-};
+}TypeGpuRibbonFollow_RE2<read="[TypeGpuRibbonFollow]">;
 
-typedef struct TypeGpuRibbonFollowExpression_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(9);
@@ -5991,11 +5735,11 @@ typedef struct TypeGpuRibbonFollowExpression_RE4
 	ExpressionAssignType size;
 	ExpressionAssignType sizeRange;
 	EFXExpressionList expressions;
-};
+}TypeGpuRibbonFollowExpression_RE4<read="[TypeGpuRibbonFollowExpression]">;
 
-typedef struct TypeGpuRibbonLength_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -6034,11 +5778,11 @@ typedef struct TypeGpuRibbonLength_RE8
 	float unkn21;
 	float unkn22;
 	float unkn23;
-};
+}TypeGpuRibbonLength_RE8<read="[TypeGpuRibbonLength]">;
 
-typedef struct TypeGpuRibbonLengthExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(14);
@@ -6056,16 +5800,16 @@ typedef struct TypeGpuRibbonLengthExpression_DD2
 	ExpressionAssignType unkn13;
 	ExpressionAssignType unkn14;
 	EFXExpressionList expressions;
-};
+}TypeGpuRibbonLengthExpression_DD2<read="[TypeGpuRibbonLengthExpression]">;
 
-typedef struct TypeStrainRibbonV1_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn1;
-	Color color0;
 	Color color1;
+	Color color2;
 	float unkn1_3;
 	float ukn2_0;
 	float ukn2_1;
@@ -6099,9 +5843,9 @@ typedef struct TypeStrainRibbonV1_RE7
 		uint ukn3_0;
 		uint ukn3_1;
 		float ukn3_2;
-		Color ukn3_3;
-		Color ukn3_4;
-		Color ukn3_5;
+		Color color3;
+		Color color4;
+		Color color5;
 		float ukn3_6;
 		float ukn3_7;
 	}
@@ -6113,11 +5857,11 @@ typedef struct TypeStrainRibbonV1_RE7
 
 	int len_boneName;
 	wstring boneName;
-};
+}TypeStrainRibbonV1_RE7<read="[TypeStrainRibbonV1]">;
 
-typedef struct TypeStrainRibbon_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -6196,11 +5940,86 @@ typedef struct TypeStrainRibbon_RE8
 	float unkn3_3;
 	int len_boneName;
 	wstring boneName;
-};
+}TypeStrainRibbonV2_RE8<read="[TypeStrainRibbonV2]">;
 
-typedef struct TypeStrainRibbonExpression_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn0_0;
+	uint unkn0_1;
+	uint unkn0_2;
+	uint unkn0_3;
+	float unkn1_0;
+	float unkn1_1;
+	float unkn1_2;
+	int unkn2;
+	float unkn3_0;
+	float unkn3_1;
+	float unkn3_2;
+	float unkn3_3;
+	float unkn3_4;
+	uint unkn3_5;
+	uint unkn4_0;
+	float unkn4_1;
+	float unkn4_2;
+	Color color0;
+	Color color1;
+	Color color2;
+	float unkn5_0;
+	float unkn5_1;
+	float unkn5_2;
+	float unkn5_3;
+	float unkn5_4;
+	float unkn5_5;
+	float unkn5_6;
+	float unkn5_7;
+	uint unkn5_8;
+	float unkn5_9;
+	float unkn5_10;
+	float unkn5_11;
+	float unkn5_12;
+	float unkn5_13;
+	float unkn5_14;
+	float unkn5_15;
+	float unkn5_16;
+	float unkn5_17;
+	float unkn5_18;
+	float unkn5_19;
+	float unkn5_20;
+	float unkn5_21;
+	float unkn5_22;
+	float unkn5_23;
+	uint unkn5_24;
+	float unkn5_25;
+	float unkn5_26;
+	uint unkn5_27;
+	float unkn5_28;
+	float unkn5_29;
+	float unkn5_30;
+	float unkn5_31;
+	int unkn6;
+	float unkn7_0;
+	float unkn7_1;
+	float unkn7_2;
+	float unkn7_3;
+	float unkn7_4;
+	float unkn7_5;
+	int len_boneName;
+	wstring boneName;
+	int unkn8_0;
+	uint unkn8_color1;
+	uint unkn8_color2;
+	float unkn8_3;
+	float unkn8_4;
+	int unkn8_5;
+	float unkn8_6;
+}TypeStrainRibbonV3_RE4<read="[TypeStrainRibbonV3]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(15);
@@ -6223,11 +6042,43 @@ typedef struct TypeStrainRibbonExpression_RE2
 
 	ExpressionAssignType unkn15;
 	EFXExpressionList expressions;
-};
+}TypeStrainRibbonExpression_RE2<read="[TypeStrainRibbonExpression]">;
 
-typedef struct TypeStrainRibbonMaterial_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	BitSet expressionBits(24);
+	ExpressionAssignType unkn1;
+	ExpressionAssignType unkn2;
+	ExpressionAssignType unkn3;
+	ExpressionAssignType unkn4;
+	ExpressionAssignType unkn5;
+	ExpressionAssignType unkn6;
+	ExpressionAssignType unkn7;
+	ExpressionAssignType unkn8;
+	ExpressionAssignType unkn9;
+	ExpressionAssignType unkn10;
+	ExpressionAssignType unkn12;
+	ExpressionAssignType posX;
+	ExpressionAssignType posY;
+	ExpressionAssignType posZ;
+	ExpressionAssignType terminalPosX;
+	ExpressionAssignType terminalPosY;
+	ExpressionAssignType terminalPosZ;
+	ExpressionAssignType unkn19;
+	ExpressionAssignType unkn20;
+	ExpressionAssignType unkn21;
+	ExpressionAssignType unkn22;
+	ExpressionAssignType unkn23;
+	ExpressionAssignType unkn24;
+	EFXExpressionList expressions;
+}TypeStrainRibbonExpressionV2_DD2<read="[TypeStrainRibbonExpressionV2]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -6305,21 +6156,21 @@ typedef struct TypeStrainRibbonMaterial_DD2
 	} else {
 		EfxMaterialStructV1 material;
 	}
-};
+}TypeStrainRibbonMaterial_DD2<read="[TypeStrainRibbonMaterial]">;
 
-typedef struct TypeStrainRibbonMaterialClip_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(1);
 	uint unkn1;
 	EfxMaterialClipData clipData;
-};
+}TypeStrainRibbonMaterialClip_DD2<read="[TypeStrainRibbonMaterialClip]">;
 
-typedef struct TypeStrainRibbonMaterialExpression_DD2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(22);
@@ -6350,48 +6201,58 @@ typedef struct TypeStrainRibbonMaterialExpression_DD2
 		EFXMaterialExpressionList materialExpressions;
 	}
 
-};
+}TypeStrainRibbonMaterialExpression_DD2<read="[TypeStrainRibbonMaterialExpression]">;
 
-typedef struct RgbCommon_Unknown
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
-	if (Version >= EfxVersion_RE4) { // end at: re4_unkn3
-		uint re4_unkn0;
-		uint re4_unkn1;
-		uint re4_unkn2;
-		uint re4_unkn3;
-	}
+	uint ukn0;
+	uint hash1;
+	uint hash2;
+	UndeterminedFieldType ukn3;
+	int ukn4;
+}UnknownRERT_233_RERT<read="[UnknownRERT_233]">;
 
-	Color color0;
-	float unkn1_0;
-	float unkn1_1;
-	float unkn1_2;
-	Color unkn1_3;
-	float unkn1_4;
-	float unkn1_5;
-	float unkn1_6;
-	uint unkn1_7;
-	uint unkn1_8;
-	uint unkn1_9;
-	uint unkn1_10;
-	uint unkn1_11;
-	uint unkn1_12;
-	uint unkn1_13;
-	uint unkn1_14;
-	uint unkn1_15;
-	uint unkn1_16;
-	uint unkn1_17;
-	uint unkn1_18;
-	uint unkn1_19;
-	uint unkn1_20;
-	uint unkn1_21;
-};
-
-typedef struct Velocity2D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn0;
+	uint unkn1;
+	uint unkn2;
+	uint unkn3;
+	float unkn4;
+	float unkn5;
+	float unkn6;
+	float unkn7;
+	ubyte unkn8;
+	ubyte unkn9;
+	ubyte unkn10;
+	float unkn11;
+	float unkn12;
+	float unkn13;
+	float unkn14;
+	float unkn15;
+	float unkn16;
+	float unkn17;
+	float unkn18;
+	float unkn19;
+	ubyte unkn20;
+}UnknownRE4_197_RE4<read="[UnknownRE4_197]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+}UnknownDD2_250_DD2<read="[UnknownDD2_250]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
@@ -6418,11 +6279,11 @@ typedef struct Velocity2D_DMC5
 		UndeterminedFieldType re4_unkn2_1;
 	}
 
-};
+}Velocity2D_DMC5<read="[Velocity2D]">;
 
-typedef struct Velocity2DExpression_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet expressionBits(13);
@@ -6443,11 +6304,11 @@ typedef struct Velocity2DExpression_RERT
 	}
 
 	EFXExpressionList expressions;
-};
+}Velocity2DExpression_RERT<read="[Velocity2DExpression]">;
 
-typedef struct Velocity3D_RE2
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version >= EfxVersion_RE2) { // end at: unkn1
@@ -6498,20 +6359,20 @@ typedef struct Velocity3D_RE2
 		float sb_unkn1;
 	}
 
-};
+}Velocity3D_RE2<read="[Velocity3D]">;
 
-typedef struct Velocity3DDelayFrame_RE4
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn2;
-};
+}Velocity3DDelayFrame_RE4<read="[Velocity3DDelayFrame]">;
 
-typedef struct Velocity3DExpression_RE3
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	if (Version >= EfxVersion_RE8) { // end at: range3
@@ -6549,11 +6410,11 @@ typedef struct Velocity3DExpression_RE3
 	}
 
 	EFXExpressionList expressions;
-};
+}Velocity3DExpression_RE3<read="[Velocity3DExpression]">;
 
-typedef struct AngularVelocity2D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn0;
@@ -6571,11 +6432,11 @@ typedef struct AngularVelocity2D_DMC5
 	float radians12;
 	float radians13;
 	float radians14;
-};
+}AngularVelocity2D_DMC5<read="[AngularVelocity2D]">;
 
-typedef struct AngularVelocity3D_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint unkn1_0;
@@ -6598,62 +6459,62 @@ typedef struct AngularVelocity3D_DMC5
 	float unkn1_17;
 	float unkn1_18;
 	float unkn1_19;
-};
+}AngularVelocity3D_DMC5<read="[AngularVelocity3D]">;
 
-typedef struct AngularVelocity3DDelayFrame_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint frameDelay;
 	uint unkn1;
-};
+}AngularVelocity3DDelayFrame_RERT<read="[AngularVelocity3DDelayFrame]">;
 
-typedef struct PtVelocity2D_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float ukn0;
 	float ukn1;
 	float ukn2;
-};
+}PtVelocity2D_RERT<read="[PtVelocity2D]">;
 
-typedef struct PtVelocity2DClip_RERT
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	uint ukn0;
 	float ukn1;
 	float ukn2;
 	uint ukn3;
-};
+}PtVelocity2DClip_RERT<read="[PtVelocity2DClip]">;
 
-typedef struct PtVelocity3D_RE7
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	float unkn1_0;
 	float unkn1_1;
 	float unkn1_2;
 	float unkn1_3;
-};
+}PtVelocity3D_RE7<read="[PtVelocity3D]">;
 
-typedef struct PtVelocity3DClip_DMC5
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	BitSet clipBits(4);
 	uint unkn1;
 	EfxClipData clipData;
-};
+}PtVelocity3DClip_DMC5<read="[PtVelocity3DClip]">;
 
-typedef struct PtAngularVelocity3D_RE8
-{    local int currentAttributeIndex = -1;
+typedef struct {    local int currentAttributeIndex = -1;
     uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
     uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
 
 	UndeterminedFieldType unkn1;
@@ -6664,7 +6525,157 @@ typedef struct PtAngularVelocity3D_RE8
 	UndeterminedFieldType unkn6;
 	float unkn7;
 	float unkn8;
-};
+}PtAngularVelocity3D_RE8<read="[PtAngularVelocity3D]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	BitSet expressionBits(7);
+	ExpressionAssignType unkn1;
+	ExpressionAssignType unkn2;
+	ExpressionAssignType unkn3;
+	ExpressionAssignType unkn4;
+	ExpressionAssignType unkn5;
+	ExpressionAssignType unkn6;
+	ExpressionAssignType unkn7;
+	EFXExpressionList expressions;
+}PtAngularVelocity3DExpression_DD2<read="[PtAngularVelocity3DExpression]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint null1;
+	float unkn2;
+	float unkn3;
+	float unkn4;
+	float null5;
+	float unkn6;
+}PtAngularVelocity2D_DD2<read="[PtAngularVelocity2D]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	uint unkn2;
+	uint unkn3;
+	uint unkn4;
+	uint unkn5;
+	uint unkn6;
+	uint unkn7;
+	EFXExpressionList expressions;
+}PtAngularVelocity2DExpression_DD2<read="[PtAngularVelocity2DExpression]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	float unkn1;
+	if (Version >= EfxVersion_MHWilds) { // end at: unkn3
+		float unkn2;
+		float unkn3;
+	}
+
+	float unkn4;
+	float unkn5;
+	float unkn6;
+	uint unkn7;
+	uint unkn8;
+	short unkn9;
+}PtVortexelWind_RE4<read="[PtVortexelWind]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	UndeterminedFieldType unkn1;
+	uint unkn2;
+	UndeterminedFieldType unkn3;
+	uint unkn4;
+	UndeterminedFieldType unkn5;
+	float unkn6;
+	UndeterminedFieldType unkn7;
+	UndeterminedFieldType unkn8;
+	UndeterminedFieldType unkn9;
+	float unkn10;
+	ByteSet unkn11;
+	float unkn12;
+	float unkn13;
+	float unkn14;
+	float unkn15;
+	float unkn16;
+	float unkn17;
+	float unkn18;
+	float unkn19;
+	float unkn20;
+	short unknShort;
+}VortexelWindEmitter_MHWilds<read="[VortexelWindEmitter]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	uint unkn2;
+	float unkn3;
+	uint unkn4;
+	float unkn5;
+	float unkn6;
+	UndeterminedFieldType unkn7;
+	float unkn8;
+	UndeterminedFieldType unkn9;
+	float unkn10;
+	float unkn11;
+	float unkn12;
+	UndeterminedFieldType unkn13;
+	float unkn14;
+	UndeterminedFieldType unkn15;
+	float unkn16;
+	UndeterminedFieldType unkn17;
+	float unkn18;
+	UndeterminedFieldType unkn19;
+	float unkn20;
+	UndeterminedFieldType unkn21;
+	float unkn22;
+	UndeterminedFieldType unkn23;
+	UndeterminedFieldType unkn24;
+	float unkn25;
+	UndeterminedFieldType unkn26;
+}PtVortexelPhysics_MHWilds<read="[PtVortexelPhysics]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	float unkn2;
+	UndeterminedFieldType unkn3;
+	float unkn4;
+	UndeterminedFieldType unkn5;
+	float unkn6;
+}PtVortexelPhysicsSimple_MHWilds<read="[PtVortexelPhysicsSimple]">;
+
+typedef struct {    local int currentAttributeIndex = -1;
+    uint itemType;
+    if (Version >= EfxVersion_MHWilds) int itemSize;
+    uint unknSeqNum <read=Str("%d = X: %d, Y: %d, Z: %d", this, this & 0xff, (this & 0xff00)>>8, (this & 0xff0000)>>16)>;
+
+	uint unkn1;
+	float unkn2;
+	float unkn3;
+	float unkn4;
+	UndeterminedFieldType unkn5;
+	float unkn6;
+}PtVortexelSnap_MHWilds<read="[PtVortexelSnap]">;
 
 void GetEFXItemStruct(string itemType)
 {
@@ -6706,6 +6717,7 @@ void GetEFXItemStruct(string itemType)
         case "FadeByDepthExpression": { FadeByDepthExpression_DMC5 attribute; } break;
         case "FadeByEmitterAngle": { FadeByEmitterAngle_DMC5 attribute; } break;
         case "FadeByOcclusion": { FadeByOcclusion_DMC5 attribute; } break;
+        case "FadeByRootCulling": { FadeByRootCulling_DD2 attribute; } break;
         case "VectorFieldParameter": { VectorFieldParameter_RE2 attribute; } break;
         case "VectorFieldParameterClip": { VectorFieldParameterClip_DMC5 attribute; } break;
         case "VectorFieldParameterExpression": { VectorFieldParameterExpression_DMC5 attribute; } break;
@@ -6720,13 +6732,14 @@ void GetEFXItemStruct(string itemType)
         case "ProceduralDistortion": { ProceduralDistortion_RE4 attribute; } break;
         case "ProceduralDistortionDelayFrame": { ProceduralDistortionDelayFrame_RE4 attribute; } break;
         case "ProceduralDistortionClip": { ProceduralDistortionClip_RE4 attribute; } break;
+        case "ProceduralDistortionExpression": { ProceduralDistortionExpression_DD2 attribute; } break;
         case "FakeDoF": { FakeDoF_DMC5 attribute; } break;
         case "WindInfluence3D": { WindInfluence3D_RE8 attribute; } break;
         case "WindInfluence3DDelayFrame": { WindInfluence3DDelayFrame_DD2 attribute; } break;
         case "DepthOcclusion": { DepthOcclusion_RE8 attribute; } break;
         case "PlaneCollider": { PlaneCollider_RE8 attribute; } break;
         case "FixRandomGenerator": { FixRandomGenerator_DMC5 attribute; } break;
-        case "EffectOptimizeShader": { EffectOptimizeShader_DD2 attribute; } break;
+        case "EffectShader": { EffectOptimizeShader_DD2 attribute; } break;
         case "Attractor": { Attractor_RERT attribute; } break;
         case "AttractorClip": { AttractorClip_RE8 attribute; } break;
         case "AttractorExpression": { AttractorExpression_RE4 attribute; } break;
@@ -6744,44 +6757,27 @@ void GetEFXItemStruct(string itemType)
         case "VanishArea3D": { VanishArea3D_RE4 attribute; } break;
         case "VanishArea3DExpression": { VanishArea3DExpression_RE4 attribute; } break;
         case "TexelChannelOperatorClip": { TexelChannelOperatorClip_RE4 attribute; } break;
+        case "RgbCommon": { RgbCommon_RE4 attribute; } break;
+        case "RgbCommonExpression": { RgbCommonExpression_DD2 attribute; } break;
+        case "RgbWater": { RgbWater_DD2 attribute; } break;
+        case "RgbWaterExpression": { RgbWaterExpression_MHWilds attribute; } break;
+        case "FlowMap": { FlowMap_MHWilds attribute; } break;
+        case "AssignCSV": { AssignCSV_RE4 attribute; } break;
+        case "DestinationCSV": { DestinationCSV_DD2 attribute; } break;
+        case "TerrainSnap": { TerrainSnap_DD2 attribute; } break;
+        case "Trigger": { Trigger_DD2 attribute; } break;
         case "PtBehavior": { PtBehavior_RE4 attribute; } break;
         case "PtColliderAction": { PtColliderAction_DMC5 attribute; } break;
         case "PtCollision": { PtCollision_RE7 attribute; } break;
+        case "PtProjection": { PtProjection_MHWilds attribute; } break;
         case "PtColor": { PtColor_RE7 attribute; } break;
         case "PtColorClip": { PtColorClip_DMC5 attribute; } break;
         case "PtLife": { PtLife_RE7 attribute; } break;
         case "PtSort": { PtSort_RE8 attribute; } break;
         case "PtUvSequence": { PtUvSequence_DMC5 attribute; } break;
         case "PtUvSequenceClip": { PtUvSequenceClip_DMC5 attribute; } break;
-        case "UnknownDD2_117TypeStrainRibbonExpression": { UnknownDD2_117Expression_DD2 attribute; } break;
-        case "UnknownDD2_146New": { UnknownDD2_146_DD2 attribute; } break;
-        case "UnknownDD2_214": { UnknownDD2_214_DD2 attribute; } break;
-        case "UnknownDD2_218": { UnknownDD2_218_DD2 attribute; } break;
-        case "UnknownDD2_219": { UnknownDD2_219_DD2 attribute; } break;
-        case "UnknownDD2_220": { UnknownDD2_220_DD2 attribute; } break;
-        case "UnknownDD2_221Expression": { UnknownDD2_221Expression_DD2 attribute; } break;
-        case "UnknownDD2_223": { UnknownDD2_223_DD2 attribute; } break;
-        case "UnknownDD2_224": { UnknownDD2_224_DD2 attribute; } break;
-        case "UnknownDD2_225Expression": { UnknownDD2_225_DD2 attribute; } break;
-        case "UnknownDD2_226": { UnknownDD2_226_DD2 attribute; } break;
-        case "UnknownDD2_231Clip": { UnknownDD2_231Clip_DD2 attribute; } break;
-        case "UnknownDD2_232Expression": { UnknownDD2_232Expression_DD2 attribute; } break;
-        case "UnknownDD2_239RgbColor": { UnknownDD2_239RgbColor_DD2 attribute; } break;
-        case "UnknownDD2_239RgbColorExpression": { UnknownDD2_239RgbColorExpression_DD2 attribute; } break;
-        case "UnknownDD2_243": { UnknownDD2_243_DD2 attribute; } break;
-        case "UnknownDD2_245Efcsv": { UnknownDD2_245Efcsv_DD2 attribute; } break;
-        case "UnknownDD2_247": { UnknownDD2_247_DD2 attribute; } break;
-        case "UnknownDD2_249": { UnknownDD2_249_DD2 attribute; } break;
-        case "UnknownDD2_250": { UnknownDD2_250_DD2 attribute; } break;
-        case "UnknownSB_195": { unknSBStruct195_MHRiseSB attribute; } break;
-        case "UnknownRE4_114TypeStrainRibbon": { UnknownRE4_114_RE4 attribute; } break;
-        case "UnknownRE4_195": { UnknownRE4_195_RE4 attribute; } break;
-        case "UnknownRE4_197": { UnknownRE4_197_RE4 attribute; } break;
-        case "UnknownRE4_213": { UnknownRE4_213_RE4 attribute; } break;
-        case "UnknownRE4_226": { UnknownRE4_226_RE4 attribute; } break;
-        case "UnknownRE4_228": { UnknownRE4_228_RE4 attribute; } break;
-        case "UnknownRE4_231EfCsv": { UnknownRE4_231_RE4 attribute; } break;
-        case "UnknownRERT_233": { UnknownRERT_233_RERT attribute; } break;
+        case "PtFreezer": { PtFreezer_DD2 attribute; } break;
+        case "PtPathTranslate": { PtPathTranslate_RE4 attribute; } break;
         case "Transform2D": { Transform2D_DMC5 attribute; } break;
         case "Transform2DClip": { Transform2DClip_RERT attribute; } break;
         case "Transform2DExpression": { Transform2DExpression_RE2 attribute; } break;
@@ -6829,9 +6825,11 @@ void GetEFXItemStruct(string itemType)
         case "TypeLightning3DMaterialClip": { TypeLightning3DMaterialClip_DD2 attribute; } break;
         case "TypeLightning3DMaterialExpression": { TypeLightning3DMaterialExpression_DD2 attribute; } break;
         case "TypeGpuLightning3D": { TypeGpuLightning3D_DD2 attribute; } break;
+        case "TypeLightningExpensive": { TypeLightningExpensive_MHWilds attribute; } break;
+        case "PtLightningBranchAction": { PtLightningBranchAction_MHWilds attribute; } break;
         case "TypeMesh": {
 			if (Version == EfxVersion_RE7 || Version == EfxVersion_RE2 || Version == EfxVersion_DMC5 || Version == EfxVersion_RE3) TypeMesh_RE7 attribute;
-			else if (Version == EfxVersion_RE8 || Version == EfxVersion_RERT || Version == EfxVersion_RE4 || Version == EfxVersion_DD2) TypeMeshV2_RE8 attribute;
+			else if (Version == EfxVersion_RE8 || Version == EfxVersion_RERT || Version == EfxVersion_RE4 || Version == EfxVersion_DD2 || Version == EfxVersion_MHWilds) TypeMeshV2_RE8 attribute;
 			else TypeMeshV2_RE8 attribute;
 		} break;
         case "TypeMeshClip": { TypeMeshClip_RE3 attribute; } break;
@@ -6888,14 +6886,21 @@ void GetEFXItemStruct(string itemType)
         case "TypeGpuRibbonLengthExpression": { TypeGpuRibbonLengthExpression_DD2 attribute; } break;
         case "TypeStrainRibbon": {
 			if (Version == EfxVersion_RE7 || Version == EfxVersion_RE2 || Version == EfxVersion_DMC5 || Version == EfxVersion_RE3) TypeStrainRibbonV1_RE7 attribute;
-			else if (Version == EfxVersion_RE8 || Version == EfxVersion_RERT) TypeStrainRibbon_RE8 attribute;
-			else TypeStrainRibbon_RE8 attribute;
+			else if (Version == EfxVersion_RE8 || Version == EfxVersion_RERT) TypeStrainRibbonV2_RE8 attribute;
+			else if (Version == EfxVersion_RE4) TypeStrainRibbonV3_RE4 attribute;
+			else TypeStrainRibbonV3_RE4 attribute;
 		} break;
-        case "TypeStrainRibbonExpression": { TypeStrainRibbonExpression_RE2 attribute; } break;
+        case "TypeStrainRibbonExpression": {
+			if (Version == EfxVersion_RE2 || Version == EfxVersion_DMC5 || Version == EfxVersion_RE8 || Version == EfxVersion_RERT) TypeStrainRibbonExpression_RE2 attribute;
+			else if (Version == EfxVersion_DD2) TypeStrainRibbonExpressionV2_DD2 attribute;
+			else TypeStrainRibbonExpressionV2_DD2 attribute;
+		} break;
         case "TypeStrainRibbonMaterial": { TypeStrainRibbonMaterial_DD2 attribute; } break;
         case "TypeStrainRibbonMaterialClip": { TypeStrainRibbonMaterialClip_DD2 attribute; } break;
         case "TypeStrainRibbonMaterialExpression": { TypeStrainRibbonMaterialExpression_DD2 attribute; } break;
-        case "RgbCommon": { RgbCommon_Unknown attribute; } break;
+        case "UnknownRERT_233": { UnknownRERT_233_RERT attribute; } break;
+        case "UnknownRE4_197": { UnknownRE4_197_RE4 attribute; } break;
+        case "UnknownDD2_250": { UnknownDD2_250_DD2 attribute; } break;
         case "Velocity2D": { Velocity2D_DMC5 attribute; } break;
         case "Velocity2DExpression": { Velocity2DExpression_RERT attribute; } break;
         case "Velocity3D": { Velocity3D_RE2 attribute; } break;
@@ -6909,6 +6914,14 @@ void GetEFXItemStruct(string itemType)
         case "PtVelocity3D": { PtVelocity3D_RE7 attribute; } break;
         case "PtVelocity3DClip": { PtVelocity3DClip_DMC5 attribute; } break;
         case "PtAngularVelocity3D": { PtAngularVelocity3D_RE8 attribute; } break;
+        case "PtAngularVelocity3DExpression": { PtAngularVelocity3DExpression_DD2 attribute; } break;
+        case "PtAngularVelocity2D": { PtAngularVelocity2D_DD2 attribute; } break;
+        case "PtAngularVelocity2DExpression": { PtAngularVelocity2DExpression_DD2 attribute; } break;
+        case "PtVortexelWind": { PtVortexelWind_RE4 attribute; } break;
+        case "VortexelWindEmitter": { VortexelWindEmitter_MHWilds attribute; } break;
+        case "PtVortexelPhysics": { PtVortexelPhysics_MHWilds attribute; } break;
+        case "PtVortexelPhysicsSimple": { PtVortexelPhysicsSimple_MHWilds attribute; } break;
+        case "PtVortexelSnap": { PtVortexelSnap_MHWilds attribute; } break;
         default:
             {
                 local uint errorItemType = ReadUInt();

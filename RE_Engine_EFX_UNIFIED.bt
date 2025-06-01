@@ -330,22 +330,22 @@ typedef struct
 
 typedef struct
 {
-	uint uvarStringCount;//This seems to be a count of uservariable strings on the end of the file
-	ubyte eof[4];
+	uint uvarType1;
+	uint uvarType2;
 
-	//Some files have the uvarString count higher than 0 but have no strings.
-	//Uncomment the section below to test it
+	typedef struct {
+		uint uvarPathLength;
+		wstring uvarPath;
+		uint groupLength;
+		wstring group;
+	} UvarGroup;
 
-	/*
-	if (uvarStringCount != 0)
-	{
-		struct
-		{
-			uint stringLength;
-			wstring uvarString;
-		}uvarString[uvarStringCount]<optimize=false>;
+	if (uvarType1 == 2) {
+		UvarGroup uvar1;
 	}
-	*/
+	if (uvarType2 == 2) {
+		UvarGroup uvar2;
+	}
 }EOF<bgcolor=0x000000>;
 
 
