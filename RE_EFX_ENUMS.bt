@@ -41,10 +41,17 @@ typedef enum <int>
 
 typedef enum <int>
 {
+	ClipValueType_Int = 3,
+	ClipValueType_Float = 5,
+} ClipValueType;
+
+typedef enum <int>
+{
+	FrameInterpolationType_Unknown = 0,
 	FrameInterpolationType_Type1 = 1,
 	FrameInterpolationType_Type2 = 2,
 	FrameInterpolationType_Type3 = 3,
-	FrameInterpolationType_Type5 = 5,
+	FrameInterpolationType_Bezier = 5,
 	FrameInterpolationType_Type13 = 13,
 } FrameInterpolationType;
 

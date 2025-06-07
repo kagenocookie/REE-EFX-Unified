@@ -6,30 +6,6 @@ typedef struct EFXBoneNameValuePair_t {
 	uint value;
 } EFXBoneNameValuePair ;
 
-typedef struct EfxClipHeader_t {
-	uint frameCount;
-	uint unkn1;
-} EfxClipHeader ;
-
-typedef struct EfxFloatClipFrame_t {
-	float frameTime;
-	FrameInterpolationType type;
-	float value;
-} EfxFloatClipFrame ;
-
-typedef struct EfxColorClipFrame_t {
-	float frameTime;
-	FrameInterpolationType type;
-	int value;
-} EfxColorClipFrame ;
-
-typedef struct EfxClipInterpolationTangents_t {
-	float value1;
-	float value2;
-	float value3;
-	float value4;
-} EfxClipInterpolationTangents ;
-
 typedef struct EfxMaterialClip_Struct4_t {
 	uint mdfPropertyHash;
 	int unkn1;
@@ -92,38 +68,8 @@ typedef struct {
 	int clipDataSize;
 	int frameDataSize;
 	int interpolationDataSize;
-	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
-	if (frameCount > 0) TClipFrameType frames[frameCount] <optimize=false>;
-	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
-}EfxClipDataBase<read="[EfxClipDataBase]">;
-
-typedef struct {
-	EfxClipPlaybackType loopType;
-	float clipDuration;
-	int clipCount;
-	int frameCount;
-	int interpolationDataCount;
-	int clipDataSize;
-	int frameDataSize;
-	int interpolationDataSize;
-	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
-	if (frameCount > 0) TClipFrameType frames[frameCount] <optimize=false>;
-	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
+	EfxClipList parsedClips;
 }EfxClipData<read="[EfxClipData]">;
-
-typedef struct {
-	EfxClipPlaybackType loopType;
-	float clipDuration;
-	int clipCount;
-	int frameCount;
-	int interpolationDataCount;
-	int clipDataSize;
-	int frameDataSize;
-	int interpolationDataSize;
-	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
-	if (frameCount > 0) TClipFrameType frames[frameCount] <optimize=false>;
-	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
-}EfxColorClipData<read="[EfxColorClipData]">;
 
 typedef struct {
 	EfxClipPlaybackType loopType;
@@ -142,9 +88,7 @@ typedef struct {
 		int indicesCount;
 	}
 
-	if (clipCount > 0) EfxClipHeader clips[clipCount] <optimize=false>;
-	if (frameCount > 0) EfxFloatClipFrame frames[frameCount] <optimize=false>;
-	if (interpolationDataCount > 0) EfxClipInterpolationTangents interpolationData[interpolationDataCount] <optimize=false>;
+	EfxClipList parsedClips;
 	if (Version >= EfxVersion_RE4 ? mdfPropertyCount : clipCount > 0) EfxMaterialClip_Struct4 mdfProperties[Version >= EfxVersion_RE4 ? mdfPropertyCount : clipCount] <optimize=false>;
 	if (Version >= EfxVersion_RE3) { // end at: indices
 		if (indicesCount > 0) uint indices[indicesCount] <optimize=false>;
@@ -728,7 +672,7 @@ typedef struct {    local int currentAttributeIndex = -1;
 
 	BitSet clipBits(4);
 	uint unkn1;
-	EfxColorClipData clipData;
+	EfxClipData clipData;
 }EmitterColorClip_RE4<read="[EmitterColorClip]">;
 
 typedef struct {    local int currentAttributeIndex = -1;
@@ -1960,6 +1904,10 @@ typedef struct {    local int currentAttributeIndex = -1;
 
 	ByteSet unkn0;
 	float unkn1;
+	if (Version >= EfxVersion_MHWilds) { // end at: mhws_unkn
+		float mhws_unkn;
+	}
+
 	ByteSet unkn2;
 	float unkn3;
 	float unkn4;
@@ -2370,7 +2318,7 @@ typedef struct {    local int currentAttributeIndex = -1;
 
 	BitSet clipBits(4);
 	uint unkn1;
-	EfxColorClipData clipData;
+	EfxClipData clipData;
 }PtColorClip_DMC5<read="[PtColorClip]">;
 
 typedef struct {    local int currentAttributeIndex = -1;

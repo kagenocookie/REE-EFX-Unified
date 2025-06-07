@@ -27,6 +27,11 @@ typedef struct {
     ubyte b1, b2, b3, b4;
 } ByteSet <read=Str("%d %d %d %d", b1, b2, b3, b4)>;
 
+typedef struct EfxClipHeader_t {
+	int frameCount;
+	ClipValueType valueType;
+} EfxClipHeader ;
+
 typedef struct
 {
 	float frameTime;
@@ -36,7 +41,43 @@ typedef struct
     } else {
         float value;
     }
-} TClipFrameType <read=ReadClipFrameType>;
+} EfxClipFrame <read=ReadClipFrameType>;
+
+typedef struct EfxClipInterpolationTangents_t {
+	float value1;
+	float value2;
+	float value3;
+	float value4;
+} EfxClipInterpolationTangents ;
+
+typedef struct EfxClipList {
+    local int clipCount = parentof(this).clipCount;
+    local int frameCount = parentof(this).frameCount;
+    if (clipCount == 0) return;
+
+    EfxClipHeader clips[clipCount];
+    local int i = 0;
+    local int f = 0;
+    local int c = 0;
+    local long curveDataStart = startof(clips) + 8 * clipCount + 12 * frameCount;
+    local long posTmp;
+    for (i = 0; i < clipCount; i++) {
+        struct {
+            local int clipType = clips[i].valueType;
+            for (f = 0; f < clips[i].frameCount; f++) {
+                EfxClipFrame frame;
+                if (frame.type == FrameInterpolationType_Bezier) {
+                    posTmp = FTell();
+                    FSeek(curveDataStart + c++ * 16);
+                    EfxClipInterpolationTangents tangents;
+                    FSeek(posTmp);
+                }
+            }
+        } Clip;
+    }
+    FSeek(curveDataStart + sizeof(EfxClipInterpolationTangents) * c);
+};
+
 
 typedef struct EFXExpressionParameter
 {
@@ -284,11 +325,14 @@ wstring ReadEFXExpressionList(EFXExpressionList &wrapper) {
     return outstr;
 }
 
-uint8 IsIntegerClip(TClipFrameType &frame) {
-    return exists( parentof(parentof(frame)).colorChannelBits );
+uint8 IsIntegerClip(EfxClipFrame &frame) {
+    if (exists(parentof(frame).clipType)) {
+        return parentof(frame).clipType == ClipValueType_Int;
+    }
+    return parentof(frame).clips[0].valueType == ClipValueType_Int;
 }
 
-string ReadClipFrameType(TClipFrameType &frame) {
+string ReadClipFrameType(EfxClipFrame &frame) {
     if ( IsIntegerClip(frame) ) {
         return Str("%f: %d", frame.frameTime, frame.value);
     } else {
