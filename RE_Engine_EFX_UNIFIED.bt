@@ -31,6 +31,7 @@ EfxVersion GetVersion(int fileVersion)
 	if (fileVersion == 3539837) return EfxVersion_RE4;
 	if (fileVersion == 4064419) return EfxVersion_DD2;
 	if (fileVersion == 5571972) return EfxVersion_MHWilds;
+	if (fileVersion == 5965300) return EfxVersion_Pragmata;
 	return EfxVersion_Unknown;
 }
 
@@ -71,6 +72,14 @@ typedef struct
 {
 	float x;
 	float y;
+	float z;
+	float w;
+}Vec4<read=ReadVec4>;
+
+typedef struct
+{
+	float x;
+	float y;
 }Vec2<read=Str("%f %f", x, y)>;
 
 typedef struct
@@ -79,6 +88,14 @@ typedef struct
 	int y;
 	int z;
 }Int3<read=ReadInt3>;
+
+typedef struct
+{
+	int x;
+	int y;
+	int z;
+	int w;
+}Int4<read=ReadInt4>;
 
 typedef struct
 {
@@ -133,8 +150,23 @@ typedef struct
 
 typedef struct
 {
+	string str;
+	wstring unicodeStr;
+	uint16 pad;
+}UnicodeEntryName2<bgcolor=0x226622,optimize=false>;
+
+typedef struct
+{
+		// if (header.unkn0 > 0) {
+		// 	UnicodeEntryName newNames[header.unkn0]<read=unicodeStr>;
+		// }
 		if (header.expressionParameterCount > 0) {
-			UnicodeEntryName expression_parameter_name[header.expressionParameterCount]<read=unicodeStr>;
+			if (header.unkn0) {
+				// TODO what the hell is this  11_em_fallivy_03.efx.5571972??
+				UnicodeEntryName2 expression_parameter_name[header.expressionParameterCount] <read=unicodeStr>;
+			} else {
+				UnicodeEntryName expression_parameter_name[header.expressionParameterCount]<read=unicodeStr>;
+			}
 		}
 		if (Version > EfxVersion_DMC5 && header.boneCount > 0)
 		UnicodeEntryName bone_name[header.boneCount]<read=unicodeStr>;
@@ -231,7 +263,11 @@ typedef struct
 			float unkn8;
 			float unkn9;
 			float unkn10;
-			if (type == 110 || type == 144 || type == 183 || type == 184 || type == 194 || type == 196 || type == 202 || type == 215)
+			if (Version >= EfxVersion_MHWilds)
+			{
+				float wilds_unkn0;
+			}
+			if (type == 110 || type == 144 || type == 183 || type == 184 || type == 194 || type == 196 || type == 202 || type == 215 || type == 217)
 			{
 				uint pathUnicodeCharCount;
 				wstring filePath;
@@ -389,6 +425,8 @@ typedef struct
         Warning("Warning - Entry length in header does not match actual entry length!");
         Printf("Warning - Entry length in header does not match actual entry length!\nActual Length:%i\nExpected Length:%i\n",FTell()-stringStartPos,header.entryLength);
     }
+
+	FSeek(stringStartPos + header.entryLength);
 
 	SubHeader subheader;
 	if (Version > EfxVersion_RE7 && header.actionCount != 0)
@@ -551,6 +589,11 @@ string ReadInt2(Int2& input){
 string ReadInt3(Int3& input){
 	string s;
 	SPrintf(s, "X:%i Y:%i Z:%i", input.x,input.y,input.z);
+	return s;
+};
+string ReadInt4(Int4& input){
+	string s;
+	SPrintf(s, "X:%i Y:%i Z:%i W:%i", input.x,input.y,input.z,input.w);
 	return s;
 };
 string ReadColor(Color& input){
